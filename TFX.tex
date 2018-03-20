@@ -1,0 +1,541 @@
+\documentclass{easychair}
+%\documentclass[debug]{easychair}
+%\documentclass[verbose]{easychair}
+%\documentclass[notimes]{easychair}
+%\documentclass[withtimes]{easychair}
+%\documentclass[a4paper]{easychair}
+%\documentclass[letterpaper]{easychair}
+
+\usepackage{amsfonts}
+\usepackage{fancyvrb}
+\usepackage[show]{ed}
+\setlength{\tabcolsep}{5pt}
+
+%\newenvironment{packed_itemize}{
+%\vspace*{-0.5em}
+%\begin{itemize}
+%  \setlength{\partopsep}{0pt}
+%  \setlength{\itemsep}{1pt}
+%  \setlength{\parskip}{0pt}
+%  \setlength{\parsep}{0pt}
+%}{\end{itemize}}
+
+\begin{document}
+\title{The TPTP Extended Typed First-order Form - TFX}
+\titlerunning{TFX}
+\author{
+    Geoff Sutcliffe\inst{1}
+\and
+    Evgeny Kotelnikov\inst{2}
+}
+\institute{
+   University of Miami, USA
+\and
+   Chalmers University of Technology, Sweden
+}
+\authorrunning{Sutcliffe, Kotelnikov}
+\clearpage
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{abstract}
+\end{abstract}
+
+%------------------------------------------------------------------------------
+\section{Introduction}
+\label{Introduction}
+
+The TPTP world \cite{Sut10} is a well established infrastructure that supports
+research, development, and deployment of Automated Theorem Proving (ATP)
+systems for classical logics.
+The TPTP world includes the TPTP problem library,
+% \cite{Sut09}, 
+the TSTP solution library,
+% \cite{Sut10}, 
+the TMTP model library,
+% \cite{SS16},
+standards for writing ATP problems and reporting ATP solutions,
+% \cite{SS+06,Sut08-KEAPPA}, 
+tools and services for processing ATP problems and solutions,
+% \cite{Sut10}, 
+and it supports the CADE ATP System Competition (CASC).
+% \cite{Sut16}.
+Various parts of the TPTP world have been deployed in a range of applications,
+in both academia and industry.
+The web page \url{http://www.tptp.org} provides access to all components.
+
+The TPTP language is one of the keys to the success of the TPTP world.
+The language is used for writing both TPTP problems and TSTP solutions,
+which enables convenient communication between different systems and
+researchers.
+Originally the TPTP world supported only first-order clause normal form (CNF)
+\cite{SS98-JAR}.
+Over the years support for full first-order form (FOF) \cite{Sut09},
+monomorphic typed first-order form (TF0) \cite{SS+12}, rank-1 polymorphic
+typed first-order form (TF1) \cite{BP13-TFF1}, monomorphic typed higher-order 
+form (TH0) \cite{SB10}, and rank-1 polymorphic typed higher-order form (TH0) 
+\cite{KSR16}, have been added.
+(TF0 and TF1 together form the TFF language family; TH0 and TH1 together form 
+the THF language family.)
+
+Since the inception of THF and TFF there have been some features that have 
+received little use, and hence little attention. 
+In particular, tuples, conditional expressions (if-then-else), and let 
+expressions (let-defn-in) were neglected, and in TFF they were horribly 
+formulated with variants to distinguish between their use with formulae and 
+terms. 
+Recently conditional expressions and let expressions have become more 
+important because of their use in software verification applications.
+In a separate development, Evgeny Kotelnikov et al. introduced the FOOL logic
+\cite{KKV15}, which extends TFF so that (i)~formulae can be used as terms 
+with the boolean type {\tt \$o}, (ii)~variables of type {\tt \$o} can be used 
+as formulae, (iii)~tuple terms and tuple types are available as first-class 
+citizens, and (iv)~conditional and let expressions are supported. 
+This logic can be automatically translated to first-order logic 
+\cite{KK+16-GCAI}.
+It is particularly useful in software verification applications \cite{KKV18}.
+The SMT language version 2 \cite{BST10} includes very similar features.
+The Typed First-order form eXtended (TFX) language remedies the
+old weaknesses, and incorporates the features of FOOL logic.
+This has been achieved by conflating (with some exceptions) formulae and 
+terms, simplifying tuples in plain TFF, including fully expressive tuples in 
+TFX, removing the old conditional expressions and let expressions from 
+TFF, and including new elegant forms as part of TFX
+(this more elegant form has been mirrored in THF, as described below).
+TFX is a superset of the TFF language. 
+
+This paper describes the extensions to the TFF language form that define the 
+TFX language, and changes to the THF language that correspond to decisions 
+made for TFX.
+The remainder of this paper is organized as follows:
+Section~\ref{TPTPFOOL} reviews the TFF and THF languages, and
+descibes the FOOL logic.
+Section~\ref{TFX} describes the TFX syntax, and the syntax changes made to
+the THF languages.
+Section~\ref{ImplementationExamples} describes the evolving software 
+support for TFX, and provides some examples that illustrate it's use.
+Section~\ref{Conclusion} concludes.
+
+%------------------------------------------------------------------------------
+\section{The TPTP Language and the FOOL Logic}
+\label{TPTPFOOL}
+
+The TPTP language is a human-readable, easily machine-parsable, flexible and
+extensible language, suitable for writing both ATP problems and solutions.
+The top level building blocks of the TPTP language are {\em annotated
+formulae}.
+An annotated formula has the form:\\
+\hspace*{1cm}{\em language}{\tt (}{\em name}{\tt ,}
+{\em role}{\tt ,}
+{\em formula}{\tt ,}
+{\tt [}{\em source}{\tt ,}
+{\tt [}{\em useful\_info}{\tt ]]).}\\
+The {\em language}s supported are clause normal form ({\tt cnf}),
+first-order form ({\tt fof}), typed first-order form ({\tt tff}), and
+typed higher-order form ({\tt thf}).
+The {\em role}, e.g., {\tt axiom}, {\tt lemma}, {\tt conjecture},
+defines the use of the formula in an ATP system.
+In the {\em formula}, terms and atoms follow Prolog conventions, i.e.,
+functions and predicates start with a lowercase letter or are {\tt '}single
+quoted{\tt '}, variables start with an uppercase letter, and all
+contain only alphanumeric characters and underscore.
+The TPTP language also supports interpreted symbols, which either start with a
+{\tt \$}, or are composed of non-alphanumeric characters, e.g., the truth
+constants {\tt \$true} and {\tt \$false}, and integer/rational/real
+numbers such as 27, 43/92, -99.66.
+The basic logical connectives are
+{\tt !}, {\tt ?}, {\tt \verb|~|}, {\tt |}, {\tt \&}, {\tt =>}, {\tt <=},
+{\tt <=>}, and {\tt <\verb|~|>},
+for
+$\forall$, $\exists$, $\neg$, $\vee$, $\wedge$, $\Rightarrow$, $\Leftarrow$,
+$\Leftrightarrow$, and $\oplus$ respectively.
+Equality and inequality are expressed as the infix operators {\tt =} and
+{\tt !=}.
+An example annotated first-order formula, supplied from a file, is:
+\[
+\begin{minipage}{\textwidth}
+\begin{verbatim}
+    fof(union,axiom,
+        ( ! [X,A,B] :
+            ( member(X,union(A,B))
+          <=> ( member(X,A)
+              | member(X,B) ) )
+        file('SET006+0.ax',union),
+        [description('Definition of union'), relevance(0.9)]).
+\end{verbatim}
+\end{minipage}
+\]
+
+%------------------------------------------------------------------------------
+\subsection{The Typed First-order Form TFF}
+\label{TFF}
+
+TFF extends the basic FOF language with {\em types} and {\em type
+declarations}.
+The TF0 variant is monomorphic, and the TF1 variant is rank-1 polymorphic.
+Every function and predicate symbol is declared before its use, with
+a {\em type signature} that specifies the types of the symbol's arguments
+and result.
+TF0 types $\tau$ have the following forms:
+\begin{itemize}
+\item the predefined types {\tt \$i} for $\iota$ (individuals) and
+      {\tt \$o} for $o$ (booleans);
+\item the predefined arithmetic types {\tt \$int} (integers), {\tt \$rat}
+      (rationals), and {\tt \$real} (reals);
+\item user-defined types (constants).
+\end{itemize}
+User-defined types are declared (before their use) to be of the kind
+{\tt \$tType}, in annotated formulae with a {\tt type} role -- see
+Figure~\ref{TF0Example} for examples.
+All symbols share the same namespace; in particular, a type cannot have the
+same name as a function or predicate symbol.
+TF0 type signatures $\varsigma$ have the following forms:
+\begin{itemize}
+\item individual types $\tau$;
+\item {\tt ($\tau_1\;$*$\;{\cdots}\;$*$\;\tau_n$)$\;$>$\;\tilde \tau$}
+      for $n > 0$, where $\tau_i$ are the argument types, and $\tilde \tau$
+      is the result type.
+      Argument types and the result type for a function cannot be
+      {\tt \$o}, and the result type for a predicate must be {\tt \$o}.
+      If $n = 1$ the parentheses are omitted.
+\end{itemize}
+The type signatures of uninterpreted symbols are declared like types, in
+annotated formulae with a {\tt type} role -- see Figure~\ref{TF0Example}
+for examples.
+The type of {\tt =} is ad hoc polymorphic over all types except {\tt \$o},
+with both arguments having the same type and the result type being {\tt \$o}.
+The types of arithmetic predicates and functions are ad hoc polymorphic
+over the arithmetic types; see \cite{SS+12} for details.
+Figure~\ref{TF0Example} illustrates some TF0 formulae, whose conjecture can
+be proved from the axioms (it is the TPTP problem {\tt PUZ130\_1.p}).
+
+\begin{figure}[htbp]
+\begin{small}
+\begin{verbatim}
+%------------------------------------------------------------------------------
+tff(animal_type,type,( animal: $tType )).
+tff(cat_type,type,( cat: $tType )).
+tff(dog_type,type,( dog: $tType )).
+tff(human_type,type,( human: $tType )).
+tff(cat_to_animal_type,type,( cat_to_animal: cat > animal )).
+tff(dog_to_animal_type,type,( dog_to_animal: dog > animal )).
+tff(garfield_type,type,( garfield: cat )).
+tff(odie_type,type,( odie: dog )).
+tff(jon_type,type,( jon: human )).
+tff(owner_of_type,type,( owner_of: animal > human )).
+tff(chased_type,type,( chased: ( dog * cat ) > $o )).
+tff(hates_type,type,( hates: ( human * human ) > $o )).
+
+tff(human_owner,axiom,(
+    ! [A: animal] :
+    ? [H: human] : H = owner_of(A) )).
+
+tff(jon_owns_garfield,axiom,(
+    jon = owner_of(cat_to_animal(garfield)) )).
+
+tff(jon_owns_odie,axiom,(
+    jon = owner_of(dog_to_animal(odie)) )).
+
+tff(jon_owns_only,axiom,(
+    ! [A: animal] :
+      ( jon = owner_of(A)
+     => ( A = cat_to_animal(garfield) | A = dog_to_animal(odie) ) ) )).
+
+tff(dog_chase_cat,axiom,(
+    ! [C: cat,D: dog] :
+      ( chased(D,C)
+     => hates(owner_of(cat_to_animal(C)),owner_of(dog_to_animal(D))) ) )).
+
+tff(odie_chased_garfield,axiom,(
+    chased(odie,garfield) )).
+
+tff(jon_hates_jon,conjecture,(
+    hates(jon,jon) )).
+%------------------------------------------------------------------------------
+\end{verbatim}
+\end{small}
+\caption{TF0 Formulae}
+\label{TF0Example}
+\end{figure}
+
+The polymorphic TF1 extends TF0 with (user-defined) {\em type constructors}, 
+{\em type variables}, polymorphic symbols, and one new binder.
+TF1 types $\tau$ have the following forms:
+\begin{itemize}
+\item the predefined types {\tt \$i} and {\tt \$o};
+\item the predefined arithmetic types {\tt \$int}, {\tt \$rat}, and 
+      {\tt \$real};
+\item user-defined $n$-ary type constructors applied to $n$ type arguments;
+\item type variables, which must be quantified by {\tt !>} -- see the type
+      signature forms below.
+\end{itemize}
+Type constructors are declared (before their use) to be of the kind
+{\tt (\$tType$\;$*$\;{\cdots}\;$*$\;$\$tType)$\;$> \$tType}, in annotated 
+formulae with a {\tt type} role.
+The type constructor's arity is the number of ``{\tt \$tType}''s before
+the {\tt >}.
+If the arity is zero the {\tt >} is omitted, and the type constructor is
+a monomorphic user-defined type constant as in TF0, else it is polymorphic.
+If the arity is less than two the parentheses are omitted.
+In the example of Figure~\ref{TF1Example}, {\tt cup\_of} is a unary type
+constructor that is is used to construct the type {\tt cup\_of(beverage))}.
+TF1 type signatures $\varsigma$ have the following forms:
+\begin{itemize}
+\item individual types $\tau$;
+\item {\tt ($\tau_1\;$*$\;{\cdots}\;$*$\;\tau_n$)$\;$>$\;\tilde \tau$}
+      for $n > 0$, where $\tau_i$ are the argument types and $\tilde \tau$
+      is the result type (with the same caveats as for TF0);
+\item {\tt !>[$\alpha_1$:$\;$\$tType,$\;{\dots}\;$,$\alpha_n$:$\;$\$tType]:$\;\varsigma$}
+      for $n > 0$, where $\alpha_1,\dots,\alpha_n$ are distinct
+      type variables and $\varsigma$ is a type signature.
+\end{itemize}
+The binder {\tt !>} in the last form denotes universal quantification in the
+style of $\lambda\Pi$ calculi.
+It is only used at the top level in polymorphic type signatures.
+All type variables must be of type {\tt \$tType}; more complex type variables,
+e.g., {\tt \$tType$\;$>$\;$\$tType} are beyond rank-1 polymorphism.
+In the example of Figure~\ref{TF1Example}, the type signature for {\tt mixture}
+is polymorphic.
+As in TF0, arithmetic symbols and equality are ad hoc polymorphic.
+Figure~\ref{TF1Example} illustrates some TF1 formulae, whose conjecture can
+be proved from the axioms (it is a variant of the TPTP problem 
+{\tt PUZ139\_1.p}).
+
+\begin{figure}[htbp]
+\begin{small}
+\begin{verbatim}
+%------------------------------------------------------------------------------
+tff(beverage_type,type,( beverage: $tType )).
+tff(syrup_type,type,( syrup: $tType )).
+tff(cup_of_type,type,( cup_of: $tType > $tType )).
+tff(full_cup_type,type,( full_cup: beverage > cup_of(beverage) )).
+tff(coffee_type,type,( coffee: beverage )).
+tff(vanilla_type,type,( vanilla: syrup )).
+tff(caramel_type,type,( caramel: syrup )).
+tff(help_stay_awake_type,type,( help_stay_awake: cup_of(beverage) > $o )).
+
+tff(mixture_type,type,(
+    mixture: !>[BeverageOrSyrup: $tType] :
+               ( ( BeverageOrSyrup * syrup ) > BeverageOrSyrup ) )).
+
+%----Coffee keeps you awake
+tff(mixture_of_coffee_help_stay_awake,axiom,(
+    ! [S: syrup] : help_stay_awake(full_cup(mixture(beverage,coffee,S))) )).
+
+%----Coffee mixed with a syrup or two helps you stay awake
+tff(syrup_coffee_help_stay_awake,conjecture,(
+    help_stay_awake(full_cup(
+      mixture(beverage,coffee,mixture(syrup,caramel,vanilla)))) )).
+%------------------------------------------------------------------------------
+\end{verbatim}
+\end{small}
+\caption{TF1 Formulae}
+\label{TF1Example}
+\end{figure}
+
+%------------------------------------------------------------------------------
+\subsection{The Typed Higher-order Form THF}
+\label{THF}
+
+THF extends FOF with higher-order notions, including adoption of curried 
+form for type declarations, lambda terms (with a lambda binder), symbol 
+application, and new binders.
+The TH0 variant is monomorphic, and the TH1 variant is rank-1 polymorphic.
+TH0 types $\tau$ have the following forms:
+\begin{itemize}
+\item the predefined types {\tt \$i} and {\tt \$o};
+\item the predefined arithmetic types {\tt \$int}, {\tt \$rat}, and 
+      {\tt \$real};
+\item user-defined types (constants);
+\item {\tt ($\tau_1\;$>$\;{\cdots}\;$>$\;\tau_n\;$>$\;\tilde \tau$)}
+      for $n > 0$, where $\tau_i$ are the argument types and $\tilde \tau$
+      is the result type.
+\end{itemize}
+TH0 type signatures $\varsigma$ have the following forms:
+\begin{itemize}
+\item individual types $\tau$.
+\end{itemize}
+The {\tt ($\tau_1\;$>$\;{\cdots}\;$>$\;\tau_n\;$>$\;\tilde \tau$)}
+form is promoted to be a type in TH0 (and TH1) forms, so that variables in
+formulae can be quantified as function types.
+The curried form means that TH0 provides the possibility of partial
+application.
+As in TF0, arithmetic symbols and equality are ad hoc polymorphic.
+The new binary connective {\tt @} represents application (explicit use of
+{\tt @} is required -- symbols cannot simply be juxtaposed) -- see
+Figure~\ref{TH0Example} for examples.
+There are three new binders: {\tt \verb|^|}, {\tt @+}, and {\tt @-}, for
+$\lambda$, $\epsilon$ (indefinite description, aka choice), and $\iota$
+(definite description).
+Use of all the connectives as terms is also supported -- this is quite
+straightforward because connectives are equivalent (in Henkin semantics -
+see below) to corresponding lambda abstractions.
+The arithmetic predicates and functions, and the equality operator, can also
+be used as terms, but must be applied to a term of a known type (which must
+be an arithmetic type for the arithmetic symbols).
+The semantics for TH0 is Henkin semantics with choice (Henkin semantics
+by definition also includes Boolean and functional extensionality)
+\cite{BBK04,Hen50}.
+Figure~\ref{TH0Example} illustrates some TH0 formulae, whose conjecture can
+be proved from the axioms (it is a variant of the TPTP problem
+{\tt PUZ140\verb|^|1.p}).
+
+\begin{figure}[htbp]
+\begin{small}
+\begin{verbatim}
+%------------------------------------------------------------------------------
+thf(syrup_type,type,( syrup: $tType )).
+thf(beverage_type,type,( beverage: $tType )).
+thf(coffee_type,type,( coffee: beverage )).
+thf(mix_type,type,( mix: beverage > syrup > beverage )).
+thf(coffee_mixture_type,type,( coffee_mixture: syrup > beverage )).
+thf(hot_type,type,( hot: beverage > $o )).
+
+%----The mixture of coffee and something
+thf(coffee_mixture_definition,definition,
+    ( coffee_mixture = ( mix @ coffee ) )).
+
+%----Any coffee mixture is hot coffee
+thf(coffee_and_syrup_is_hot_coffee,axiom,(
+    ! [S: syrup] : ( ( (coffee_mixture @ S) = coffee )
+                   & ( hot @ ( coffee_mixture @ S ) )) )).
+
+%----There is some mixture of coffee and any syrup which is hot coffee
+thf(there_is_hot_coffee,conjecture,(
+    ? [SyrupMixer: syrup > beverage] :
+    ! [S: syrup] :
+    ? [B: beverage] :
+      ( ( B = ( SyrupMixer @ S ) ) & ( B = coffee ) & ( hot @ B ) ) )).
+%------------------------------------------------------------------------------
+\end{verbatim}
+\end{small}
+\caption{TH0 Formulae}
+\label{TH0Example}
+\end{figure}
+
+
+The polymorphic TH1 combines the higher-order features of TH0 
+with the polymorphic features of TF1.
+TH1 also adds five new polymorphic constants.
+TH1 types $\tau$ have the following forms:
+\begin{itemize}
+\item the predefined types {\tt \$i} and {\tt \$o};
+\item user-defined $n$-ary type constructors applied to $n$ type arguments;
+\item type variables (which must be quantified by {\tt !>});
+\item {\tt ($\tau_1\;$>$\;{\cdots}\;$>$\;\tau_n\;$>$\;\tilde \tau$)}
+      for $n > 0$, where $\tau_i$ are the argument types and $\tilde \tau$
+      is the result type.
+\end{itemize}
+TH1 type signatures $\varsigma$ have the following forms:
+\begin{itemize}
+\item individual types;
+\item {\tt !>[$\alpha_1$:$\;$\$tType,$\;{\dots}\;$,$\alpha_n$:$\;$\$tType]:$\;\varsigma$}
+\ for $n > 0$, where $\alpha_1,\dots,\alpha_n$ are distinct
+type variables and $\varsigma$ is a type signature.
+\end{itemize}
+TH1 has five new polymorphic constants:
+{\tt !!} for $\Pi$ (universal quantification),
+{\tt ??} for $\Sigma$ (existential quantification),
+{\tt @@+} for $\epsilon$ (indefinite description, aka choice),
+{\tt @@-} for $\iota$ (definite description), 
+and  
+{\tt @=} (equality).\footnote{%
+{\tt !!} and {\tt ??} used to be in TH0, but they have been moved out to
+be in only TH1 now.}
+Each of these must be instantiated by applying them to exactly one type 
+argument, e.g.,\\
+\hspace*{1cm}{\tt ?$\;$[B:$\;$bird]$\;$:$\;$($\;$(@=$\;$@$\;$bird)$\;$@$\;$tweety$\;$@$\;$B$\;$)}.
+Figure~\ref{TH1Example} illustrates some TH1 formulae, whose conjecture can
+be proved from the axioms.
+It declares and axiomatizes {\tt lookup} and {\tt update} operations on
+maps, then conjectures that {\tt update} is idempotent for certain keys and
+values.
+
+\begin{figure}[htbp]
+\begin{small}
+\begin{verbatim}
+%------------------------------------------------------------------------------
+thf(bird_type,type,( bird: $tType )).
+thf(tweety_type,type,( tweety: bird )).
+
+thf(list_type,type,( list: $tType > $tType )).
+thf(map_type,type,( map: $tType > $tType > $tType )).
+
+thf(bird_lookup_type,type,(
+    bird_lookup: !>[A: $tType,B: $tType] : ( ( map @ A @ B ) > A > B ) )).
+thf(bird_update_type,type,(
+    bird_update: !>[A: $tType,B: $tType] :
+                   ( ( map @ A @ B ) > A > B > ( map @ A @ B ) ) )).
+thf(idempotent_type,type,( idempotent: !>[A: $tType] : ( ( A > A ) > $o ) )).
+
+thf(bird_lookup_update_same,axiom,(
+    ! [RangeType: $tType,Map: ( map @ bird @ RangeType ),
+       Key: bird,Value: RangeType] :
+      ( ( bird_lookup @ bird @ RangeType @
+          ( bird_update @ bird @ RangeType @ Map @ Key @ Value ) @ Key )
+      = Value ) )).
+
+thf(idempotent_def,definition,(
+    ! [A: $tType,F: ( A > A )] :
+      ( ( idempotent @ A @ F )
+      = ( ! [X: A] : ( ( F @ ( F @ X ) ) = ( F @ X ) ) ) ) )).
+
+thf(higher_order_conjecture,conjecture,(
+    ! [Value: ( list @ $i )] :
+      ( idempotent @ ( map @ bird @ ( list @ $i ) )
+      @ ^ [Map: ( map @ bird @ ( list @ $i ) )] :
+          ( bird_update @ bird @ ( list @ $i ) @ Map @ tweety @ Value ) ) )).
+%------------------------------------------------------------------------------
+\end{verbatim}
+\end{small}
+\caption{TH1 Formulae}
+\label{TH1Example}
+\end{figure}
+
+%------------------------------------------------------------------------------
+\subsection{The FOOL Logic}
+\label{FOOL}
+
+%------------------------------------------------------------------------------
+\section{The TFX Syntax}
+\label{TFX}
+
+%------------------------------------------------------------------------------
+\section{Implementation and Examples}
+\label{ImplementationExamples}
+
+%------------------------------------------------------------------------------
+\section{Conclusion}
+\label{Conclusion}
+
+This paper has described the polymorphic typed-higher order form (TH1)
+in the TPTP language family, which extends the monomorphic TH0 language
+with TF1-style rank-1 polymorphism.
+A type-checker for the language has been developed.
+Now that the language has been specified, TH1 problems can be added to
+the TPTP problem library.
+Already hundreds of problems have been collected from various sources,
+e.g., the HOL(y)Hammer and Sledgehammer exports from HOL \cite{KU15a,SBP13},
+and \cite{MI+16}.
+The addition of TH1 problems to the TPTP should provide the impetus for ATP
+system developers to extend their systems to TH1. In fact many systems 
+could process TH1 with modifications to their parsers only, including
+LEO-III \cite{WSB14} and Why3 \cite{BF+15}.
+The hope is that TH1 will be implemented in many popular ATP systems for
+typed higher-order logic.
+Beyond that, a TH1 division could be added to CASC to further stimulate
+development of robust TH1 ATP systems that are useful and easily deployed in
+applications, leading to increased and highly effective use.
+
+\paragraph{Acknowledgements.}
+Thanks to Jasmin Blanchette and Christoph Benzm{\"u}ller for their
+constructive input, and to Jasmin Blanchette and Andrei Paskevich for
+letting us plagerize parts of their TF1 paper \cite{BP13-TFF1}.
+Kaliszyk was supported by the Austrian Science Fund grant P26201.
+
+%------------------------------------------------------------------------------
+\bibliographystyle{plain}
+\bibliography{Bibliography}
+%------------------------------------------------------------------------------
+\end{document}
+%------------------------------------------------------------------------------
