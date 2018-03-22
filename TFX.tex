@@ -111,9 +111,9 @@ TFX language, and changes to the THF language that correspond to decisions
 made for TFX.
 The remainder of this paper is organized as follows:
 Section~\ref{TPTPFOOL} reviews the TFF and THF languages, and
-descibes the FOOL logic.
-Section~\ref{TFX} describes the TFX syntax, and the syntax changes made to
-the THF languages.
+describes the FOOL logic.
+Section~\ref{TFX} describes the new features of TFX and their syntax, and 
+the syntax changes made to the THF language.
 Section~\ref{ImplementationExamples} describes the evolving software 
 support for TFX, and provides some examples that illustrate it's use.
 Section~\ref{Conclusion} concludes.
@@ -501,6 +501,11 @@ thf(higher_order_conjecture,conjecture,(
 %------------------------------------------------------------------------------
 \section{The TFX Syntax}
 \label{TFX}
+
+Tuples, numbers, and "distinct objects" are terms but not formulae.
+All formulae are terms.  
+From the point of view of the first class boolean sort terms and formulas 
+are fully conflated.
 
 %------------------------------------------------------------------------------
 \section{Implementation and Examples}
