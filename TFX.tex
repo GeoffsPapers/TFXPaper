@@ -26,7 +26,7 @@
 \author{
     Geoff Sutcliffe\inst{1}
 \and
-    Evgeny Kotelnikov\inst{2}
+    Evgenii Kotelnikov\inst{2}
 }
 \institute{
    University of Miami, USA
@@ -86,15 +86,17 @@ formulated with variants to distinguish between their use with formulae and
 terms. 
 Recently conditional expressions and let expressions have become more 
 important because of their use in software verification applications.
-In a separate development, Evgeny Kotelnikov et al. introduced the FOOL logic
+In a separate development, Evgenii Kotelnikov et al. introduced the FOOL logic
 \cite{KKV15}, which extends TFF so that (i)~formulae can be used as terms 
-with the boolean type {\tt \$o}, (ii)~variables of type {\tt \$o} can be used 
+of the boolean type {\tt \$o}, (ii)~variables of type {\tt \$o} can be used 
 as formulae, (iii)~tuple terms and tuple types are available as first-class 
 citizens, and (iv)~conditional and let expressions are supported. 
-This logic can be automatically translated to first-order logic 
-\cite{KK+16-GCAI}.
-It is particularly useful in software verification applications \cite{KKV18}.
-The SMT language version 2 \cite{BST10} includes very similar features.
+This logic can be automatically translated to ordinary many-sorted first-order
+logic \cite{KK+16-GCAI}.
+Features of FOOL can be used to concisely express problems coming from program
+analysis \cite{KKV18} or translated from more expressive logics.
+Conditional expressions and let expressions of FOOL resemble these features of
+the SMT-LIB language version 2 \cite{BST10}.
 The Typed First-order form eXtended (TFX) language remedies the
 old weaknesses, and incorporates the features of FOOL logic.
 This has been achieved by conflating (with some exceptions) formulae and 
