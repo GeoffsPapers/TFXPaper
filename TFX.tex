@@ -6,7 +6,7 @@
 %\documentclass[a4paper]{easychair}
 %\documentclass[letterpaper]{easychair}
 
-\usepackage{amsfonts}
+\usepackage{amsfonts,dsfont}
 \usepackage{fancyvrb}
 \usepackage[show]{ed}
 \setlength{\tabcolsep}{5pt}
@@ -19,6 +19,9 @@
 %  \setlength{\parskip}{0pt}
 %  \setlength{\parsep}{0pt}
 %}{\end{itemize}}
+
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily,morekeywords={if,assert}}
 
 \begin{document}
 \title{The TPTP Extended Typed First-order Form - TFX}
@@ -40,6 +43,22 @@
 
 \begin{abstract}
 \end{abstract}
+
+\newcommand{\binding}[2]{{#1}={#2}}
+\newcommand{\ite}[3]{\mathtt{if}\;{#1}\;\allowbreak\mathtt{then}\;{#2}\;\allowbreak\mathtt{else}\;{#3}}
+\newcommand{\letin}[3]{\mathtt{let}\;\binding{#1}{#2}\;\allowbreak\mathtt{in}\;{#3}}
+\newcommand{\letindef}[2]{\mathtt{let}\;{#1}\;\allowbreak\mathtt{in}\;{#2}}
+\newcommand{\letnl}[3]{\begin{aligned}[t]\mathtt{let}\;&\binding{#1}{#2}\\[-0.2em]\mathtt{in}\;&{#3}\end{aligned}}
+\newcommand{\letinnl}[3]{\begin{aligned}[t]&\mathtt{let}\;\binding{#1}{#2}\;\mathtt{in}\\[-0.2em]&\quad{#3}\end{aligned}}
+\newcommand{\itenll}[3]{\begin{aligned}[t]&\mathtt{if}\;{#1}\\[-0.2em]&\mathtt{then}\;{#2}\\[-0.2em]&\mathtt{else}\;{#3}\end{aligned}}
+
+\renewcommand{\implies}{\Rightarrow}
+\newcommand{\liff}{\Leftrightarrow}
+\newcommand{\lniff}{\not\Leftrightarrow}
+% \newcommand{\lor}{\vee}
+\newcommand{\eql}{\doteq}
+\newcommand{\neql}{\not\doteq}
+\newcommand{\bool}{\mathit{bool}}
 
 %------------------------------------------------------------------------------
 \section{Introduction}
@@ -497,6 +516,182 @@ thf(higher_order_conjecture,conjecture,(
 %------------------------------------------------------------------------------
 \subsection{The FOOL Logic}
 \label{FOOL}
+FOOL~\cite{KKV15}, standing for first-order logic (FOL) + bool, is a variation
+of many-sorted first-order logic that (1) contains a boolean sort with a fixed
+interpretation, (2) treats terms of the boolean sort as formulas, (3) contains
+if-then-else expressions, and (4) contains let-in expressions with definitions
+of function symbols, predicate symbols, and tuples.
+
+There is a model-preserving transformation of FOOL formulas to FOL
+formulas~\cite{KKV15}. An implementation of this transformation makes it
+possible to prove FOOL formulas using a first-order theorem prover. Formulas of
+FOOL can also be efficiently translated to a first-order clausal normal form
+using the VCNF clasufication algorithm~\cite{KK+16-GCAI}.
+
+In the following subsections we summarise the features of FOOL and illustrate
+them using examples taken from \cite{KK+16} and \cite{KKV18}.
+
+\subsubsection{First-class boolean sort}
+FOOL contains a fixed two-element first class sort $\bool$ and considers terms
+of the $\bool$ sort to be formulas.
+
+FOOL allows quantification over $\bool$ and usage of boolean variables as
+formulas. Formula~\ref{eq:fool-bool-var} is a syntactically correct tautology
+in FOOL.
+\begin{equation}\label{eq:fool-bool-var}
+(\forall x:\bool)(x \lor \neg x)
+\end{equation}
+
+FOOL allows functions and predicates to take booleans as arguments. For
+example, one can define the logical implication as a binary function
+$\mathit{impl}$ of the type $\bool \times \bool \to \bool$ using the following
+axiom.
+\begin{equation}\label{eq:fool-impl}
+(\forall x:\bool)(\forall y:\bool)(\mathit{impl}(x,y) \liff \neg x \lor y).
+\end{equation}
+
+Unlike the standard FOL, FOOL does not make a distinction between formulas and
+boolean terms. It means that a function or a predicate can take a formula as a
+boolean argument, and formulas can be used as arguments to equality between
+booleans. For example, with the definition of $\mathit{impl}$, given earlier,
+we can express in FOOL that $P$ is a graph of a (partial) function of the type
+$\sigma \to \tau$ as follows.
+\begin{equation}\label{eq:bool-arg-example}
+(\forall x:\sigma)(\forall y:\tau)(\forall z:\tau)
+\mathit{impl}(P(x,y) \land P(x,z), y \eql z)
+\end{equation}
+
+Formula \ref{eq:fool-impl} can be equivalently expressed with $\eql$ instead of
+$\liff$.
+
+\subsubsection{if-then-else expressions}
+FOOL contains expressions of the form $\ite{\psi}{s}{t}$, where $\psi$ is a
+boolean term, and $s$ and $t$ are terms of the same sort. The semantics of such
+expressions mirrors the semantics of conditional expressions in programming
+languages.
+
+if-then-else expressions are convenient for expressing formulas coming from
+program analysis and interactive theorem provers. For example, consider the
+$\mathit{max}$ function of the type $\mathds{Z}\times\mathds{Z}\to\mathds{Z}$
+that returns the maximum of its arguments. Its definition can be expressed in
+FOOL as
+\begin{equation}\label{eq:ite-t-example}
+(\forall x:\mathds{Z})(\forall y:\mathds{Z})
+(\mathit{max}(x, y) \eql \ite{x \geq y}{x}{y}).
+\end{equation}
+
+FOOL allows if-then-else expressions to occur as formulas, like in the
+following valid property of $\mathit{max}$
+\begin{equation}\label{eq:ite-f-example}
+(\forall x:\mathds{Z})(\forall y:\mathds{Z})
+(\ite{\mathit{max}(x, y) \eql x}{x \geq y}{y \geq x}).
+\end{equation}
+
+\subsubsection{let-in expressions}
+FOOL contains expressions of the form $\letindef{D_1;\ldots;D_k}{t}$, where
+$k > 0$, $t$ is either a term or a formula, and $D_1,\ldots,D_k$ are
+simultaneous non-recursive definitions. FOOL allows definitions of function
+symbols, predicate symbols, and tuples.
+
+\paragraph{Definitions of function symbols}
+Definition of a function symbol $f:\sigma_1\times\ldots\times\sigma_n\to\tau$
+has the form $\binding{f(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{s}$, where
+$n \geq 0$, and $s$ is a term of the sort $\tau$.
+
+The following let-in expression denotes the maximum of three integer constants
+$a$, $b$, and $c$ using a local definition of the function symbol
+$\mathit{max}$.
+\begin{equation}\label{eq:fool-let-impl}
+\begin{aligned}
+\mathtt{let}\;&\binding{\mathit{max}(x:\mathds{Z},y:\mathds{Z})}
+                       {\ite{x \geq y}{x}{y}}\\
+ \mathtt{in}\;&\mathit{max}(\mathit{max}(a,b),c)
+\end{aligned}
+\end{equation}
+
+\paragraph{Definitions of predicate symbols}
+Definition of a predicate symbol $p:\sigma_1\times\ldots\times\sigma_n$ has the
+form $\binding{p(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{\phi}$, where $n \geq 0$,
+and $\phi$ is a formula.
+
+The following let-in expression denotes equivalence of two boolean constants 
+$A$ and $B$ using a local definition of the predicate symbol $\mathit{impl}$.
+\begin{equation}\label{eq:fool-let-impl}
+\begin{aligned}
+\mathtt{let}\;&\binding{\mathit{impl}(x:\bool,y:\bool)}{\neg x \lor y}\\
+ \mathtt{in}\;&\mathit{impl}(A,B)\wedge\mathit{impl}(B,A)
+\end{aligned}
+\end{equation}
+
+\paragraph{Definitions of tuples}
+Definition of a tuple has the form $\binding{(c_1,\ldots,c_n)}{s}$, where
+$n > 1$, $c_1,\ldots,c_n$ are constant symbols of the sorts
+$\sigma_1,\ldots,\sigma_n$, respectively, and $s$ is a tuple expression.
+A tuple expression is inductively defined to be either
+\begin{enumerate}
+  \item $(s_1,\ldots,s_n)$, where $s_1,\ldots,s_n$ are terms of the sorts
+        $\sigma_1,\ldots,\sigma_n$, respectively;
+  \item $\ite{\phi}{s_1}{s_2}$, where $\phi$ is a formula, and $s_1$ and $s_2$
+        are tuple expressions; or
+  \item $\letindef{D_1;\ldots;D_k}{s'}$, where $D_1;\ldots;D_k$ are definitions,
+        and $s'$ is a tuple expression.
+\end{enumerate}
+
+The main application of let-in expressions with tuple definitions is in problems
+coming from program analysis, namely modelling of assignments~\cite{KKV18}.
+Figure~\ref{fig:boogie/simple-if} shows an example of an imperative program
+with assignments to integer variable, an \texttt{if} statement, and an
+\texttt{assert} statement. One can encode the \texttt{assert} condition as a
+FOOL formula (Figure~\ref{fig:boogie/simple-if-fool}) using let-in expressions
+with definitions of tuples that capture variables updated in different branches
+of the \texttt{if} statement.
+\begin{figure}
+  \quad\qquad\qquad
+  \parbox{4.5cm}{
+    \vspace{1em}
+    \begin{center}
+    \begin{tabular}{c}
+    \begin{lstlisting}^^J
+if (x > y) \{^^J
+\ \ t := x;^^J
+\ \ x := y;^^J
+\ \ y := t;^^J
+\}^^J
+assert x <= y;^^J
+    \end{lstlisting}
+    \end{tabular}
+    \end{center}
+    \vspace{1em}
+    \caption{An imperative program with an \texttt{if} statement.}
+    \label{fig:boogie/simple-if}
+  }
+\qquad
+  \begin{minipage}{6cm}
+\[
+  \letnl{(x,y,t)}{\itenll{x > y}
+                 {\letinnl{t}{x}
+                          {\letinnl{x}{y}
+                                   {\letinnl{y}{t}
+                                            {(x,y,t)}}}}
+                 {(x,y,t)}}
+        {x \le y}
+\]
+    \caption{A FOOL encoding of the program assertion on
+    Figure~\ref{fig:boogie/simple-if}.}
+    \label{fig:boogie/simple-if-fool}
+  \end{minipage}
+\vspace{-1.5em}
+\end{figure}
+
+The semantics of let-in expressions in FOOL mirrors the semantics of
+simultaneous non-recursive local definitions in programming languages. That is,
+neither of the definitions $D_1,\ldots,\allowbreak D_n$ uses function or
+predicate symbols created by any other definition. In the following example,
+constants $a$ and $b$ are swapped by a let-in expression. The resulting formula
+is equivalent to $f(b, a)$.
+\begin{equation}\label{eq:parallel-let-example}
+\mathtt{let}\;\binding{a}{b}\,;\,\binding{b}{a}\;\mathtt{in}\;f(a, b)
+\end{equation}
 
 %------------------------------------------------------------------------------
 \section{The TFX Syntax}
