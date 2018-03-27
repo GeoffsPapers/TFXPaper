@@ -123,8 +123,8 @@ This has been achieved by conflating (with some exceptions) formulae and
 terms, simplifying tuples in plain TFF, including fully expressive tuples in 
 TFX, removing the old conditional expressions and let expressions from 
 TFF, and including new elegant forms of conditional expressions and let 
-expressions as part of TFX (this more elegant form has been mirrored in THF, 
-as described below).
+expressions as part of TFX. 
+These more elegant forms have been mirrored in THF.
 TFX is a superset of the TFF language. 
 
 This paper describes the extensions to the TFF language form that define the 
@@ -133,8 +133,8 @@ made for TFX.
 The remainder of this paper is organized as follows:
 Section~\ref{TPTPFOOL} reviews the TFF and THF languages, and
 describes the FOOL logic.
-Section~\ref{TFX} describes the new features of TFX and their syntax, and 
-the syntax changes made to the THF language.
+Section~\ref{TFX} provides technical and syntax details of the new features 
+of TFX.
 Section~\ref{ImplementationExamples} describes the evolving software 
 support for TFX, and provides some examples that illustrate it's use.
 Section~\ref{Conclusion} concludes.
@@ -237,44 +237,34 @@ be proved from the axioms (it is the TPTP problem {\tt PUZ130\_1.p}).
 \begin{small}
 \begin{verbatim}
 %------------------------------------------------------------------------------
-tff(animal_type,type,( animal: $tType )).
-tff(cat_type,type,( cat: $tType )).
-tff(dog_type,type,( dog: $tType )).
-tff(human_type,type,( human: $tType )).
-tff(cat_to_animal_type,type,( cat_to_animal: cat > animal )).
-tff(dog_to_animal_type,type,( dog_to_animal: dog > animal )).
-tff(garfield_type,type,( garfield: cat )).
-tff(odie_type,type,( odie: dog )).
-tff(jon_type,type,( jon: human )).
-tff(owner_of_type,type,( owner_of: animal > human )).
-tff(chased_type,type,( chased: ( dog * cat ) > $o )).
-tff(hates_type,type,( hates: ( human * human ) > $o )).
+tff(animal_type,type, animal: $tType ).
+tff(cat_type,type, cat: $tType ).
+tff(dog_type,type, dog: $tType ).
+tff(human_type,type, human: $tType ).
+tff(cat_to_animal_type,type, cat_to_animal: cat > animal ).
+tff(dog_to_animal_type,type, dog_to_animal: dog > animal ).
+tff(garfield_type,type, garfield: cat ).
+tff(odie_type,type, odie: dog ).
+tff(jon_type,type, jon: human ).
+tff(owner_of_type,type, owner_of: animal > human ).
+tff(chased_type,type, chased: ( dog * cat ) > $o ).
+tff(hates_type,type, hates: ( human * human ) > $o ).
 
-tff(human_owner,axiom,(
-    ! [A: animal] :
-    ? [H: human] : H = owner_of(A) )).
-
-tff(jon_owns_garfield,axiom,(
-    jon = owner_of(cat_to_animal(garfield)) )).
-
-tff(jon_owns_odie,axiom,(
-    jon = owner_of(dog_to_animal(odie)) )).
-
-tff(jon_owns_only,axiom,(
+tff(human_owner,axiom, ! [A: animal] : ? [H: human] : H = owner_of(A) ).
+tff(jon_owns_garfield,axiom, jon = owner_of(cat_to_animal(garfield)) ).
+tff(jon_owns_odie,axiom, jon = owner_of(dog_to_animal(odie)) ).
+tff(jon_owns_only,axiom,
     ! [A: animal] :
       ( jon = owner_of(A)
-     => ( A = cat_to_animal(garfield) | A = dog_to_animal(odie) ) ) )).
+     => ( A = cat_to_animal(garfield) | A = dog_to_animal(odie) ) ) ).
 
-tff(dog_chase_cat,axiom,(
+tff(dog_chase_cat,axiom,
     ! [C: cat,D: dog] :
       ( chased(D,C)
-     => hates(owner_of(cat_to_animal(C)),owner_of(dog_to_animal(D))) ) )).
+     => hates(owner_of(cat_to_animal(C)),owner_of(dog_to_animal(D))) ) ).
+tff(odie_chased_garfield,axiom, chased(odie,garfield) ).
 
-tff(odie_chased_garfield,axiom,(
-    chased(odie,garfield) )).
-
-tff(jon_hates_jon,conjecture,(
-    hates(jon,jon) )).
+tff(jon_hates_jon,conjecture, hates(jon,jon) ).
 %------------------------------------------------------------------------------
 \end{verbatim}
 \end{small}
@@ -359,168 +349,168 @@ An example of TF1 formulae can been found in \cite{KSR16}.
 % \end{figure}
 
 %------------------------------------------------------------------------------
-\subsection{The Typed Higher-order Form THF}
-\label{THF}
-
-THF extends FOF with higher-order notions, including adoption of curried 
-form for type declarations, lambda terms (with a lambda binder), symbol 
-application, and new binders.
-The TH0 variant is monomorphic, and the TH1 variant is rank-1 polymorphic.
-TH0 types $\tau$ have the following forms:
-\begin{itemize}
-\item the predefined types {\tt \$i} and {\tt \$o};
-\item the predefined arithmetic types {\tt \$int}, {\tt \$rat}, and 
-      {\tt \$real};
-\item user-defined types (constants);
-\item {\tt ($\tau_1\;$>$\;{\cdots}\;$>$\;\tau_n\;$>$\;\tilde \tau$)}
-      for $n > 0$, where $\tau_i$ are the argument types and $\tilde \tau$
-      is the result type.
-\end{itemize}
-TH0 type signatures $\varsigma$ have the following forms:
-\begin{itemize}
-\item individual types $\tau$.
-\end{itemize}
-The {\tt ($\tau_1\;$>$\;{\cdots}\;$>$\;\tau_n\;$>$\;\tilde \tau$)}
-form is promoted to be a type in TH0 (and TH1) forms, so that variables in
-formulae can be quantified as function types.
-The curried form means that TH0 provides the possibility of partial
-application.
-As in TF0, arithmetic symbols and equality are ad hoc polymorphic.
-The new binary connective {\tt @} represents application.
-% (explicit use of
-% {\tt @} is required -- symbols cannot simply be juxtaposed) -- see
-% Figure~\ref{TH0Example} for examples.
-There are three new binders: {\tt \verb|^|}, {\tt @+}, and {\tt @-}, for
-$\lambda$, $\epsilon$ (indefinite description, aka choice), and $\iota$
-(definite description).
-Use of all the connectives as terms is also supported.
-%  -- this is quite
-% straightforward because connectives are equivalent (in Henkin semantics -
-% see below) to corresponding lambda abstractions.
-% The arithmetic predicates and functions, and the equality operator, can also
-% be used as terms, but must be applied to a term of a known type (which must
-% be an arithmetic type for the arithmetic symbols).
-The semantics for TH0 is Henkin semantics with choice (Henkin semantics
-by definition also includes Boolean and functional extensionality)
-\cite{BBK04,Hen50}.
-Figure~\ref{TH0Example} illustrates some TH0 formulae, whose conjecture can
-be proved from the axioms (it is a variant of the TPTP problem
-{\tt PUZ140\verb|^|1.p}).
-
-\begin{figure}[htbp]
-\begin{small}
-\begin{verbatim}
-%------------------------------------------------------------------------------
-thf(syrup_type,type,( syrup: $tType )).
-thf(beverage_type,type,( beverage: $tType )).
-thf(coffee_type,type,( coffee: beverage )).
-thf(mix_type,type,( mix: beverage > syrup > beverage )).
-thf(coffee_mixture_type,type,( coffee_mixture: syrup > beverage )).
-thf(hot_type,type,( hot: beverage > $o )).
-
-%----The mixture of coffee and something
-thf(coffee_mixture_definition,definition,
-    ( coffee_mixture = ( mix @ coffee ) )).
-
-%----Any coffee mixture is hot coffee
-thf(coffee_and_syrup_is_hot_coffee,axiom,(
-    ! [S: syrup] : ( ( (coffee_mixture @ S) = coffee )
-                   & ( hot @ ( coffee_mixture @ S ) )) )).
-
-%----There is some mixture of coffee and any syrup which is hot coffee
-thf(there_is_hot_coffee,conjecture,(
-    ? [SyrupMixer: syrup > beverage] :
-    ! [S: syrup] :
-    ? [B: beverage] :
-      ( ( B = ( SyrupMixer @ S ) ) & ( B = coffee ) & ( hot @ B ) ) )).
-%------------------------------------------------------------------------------
-\end{verbatim}
-\end{small}
-\caption{TH0 Formulae}
-\label{TH0Example}
-\end{figure}
-
-
-The polymorphic TH1 combines the higher-order features of TH0 
-with the polymorphic features of TF1.
-TH1 also adds five new polymorphic constants.
-TH1 types $\tau$ have the following forms:
-\begin{itemize}
-\item the predefined types {\tt \$i} and {\tt \$o};
-\item user-defined $n$-ary type constructors applied to $n$ type arguments;
-\item type variables (which must be quantified by {\tt !>});
-\item {\tt ($\tau_1\;$>$\;{\cdots}\;$>$\;\tau_n\;$>$\;\tilde \tau$)}
-      for $n > 0$, where $\tau_i$ are the argument types and $\tilde \tau$
-      is the result type.
-\end{itemize}
-TH1 type signatures $\varsigma$ have the following forms:
-\begin{itemize}
-\item individual types;
-\item {\tt !>[$\alpha_1$:$\;$\$tType,$\;{\dots}\;$,$\alpha_n$:$\;$\$tType]:$\;\varsigma$}
-\ for $n > 0$, where $\alpha_1,\dots,\alpha_n$ are distinct
-type variables and $\varsigma$ is a type signature.
-\end{itemize}
-TH1 has five new polymorphic constants:
-{\tt !!} for $\Pi$ (universal quantification),
-{\tt ??} for $\Sigma$ (existential quantification),
-{\tt @@+} for $\epsilon$ (indefinite description, aka choice),
-{\tt @@-} for $\iota$ (definite description), 
-and  
-{\tt @=} (equality).
-% \footnote{%
-% {\tt !!} and {\tt ??} used to be in TH0, but they have been moved out to
-% be in only TH1 now.}
-Each of these must be instantiated by applying them to exactly one type 
-argument.
-% e.g.,\\
-%\hspace*{1cm}{\tt ?$\;$[B:$\;$bird]$\;$:$\;$($\;$(@=$\;$@$\;$bird)$\;$@$\;$tweety$\;$@$\;$B$\;$)}.
-An example of TH1 formulae can been found in \cite{KSR16}.
-% Figure~\ref{TH1Example} illustrates some TH1 formulae, whose conjecture can
-% be proved from the axioms.
-% It declares and axiomatizes {\tt lookup} and {\tt update} operations on
-% maps, then conjectures that {\tt update} is idempotent for certain keys and
-% values.
+% \subsection{The Typed Higher-order Form THF}
+% \label{THF}
+% 
+% THF extends FOF with higher-order notions, including adoption of curried 
+% form for type declarations, lambda terms (with a lambda binder), symbol 
+% application, and new binders.
+% The TH0 variant is monomorphic, and the TH1 variant is rank-1 polymorphic.
+% TH0 types $\tau$ have the following forms:
+% \begin{itemize}
+% \item the predefined types {\tt \$i} and {\tt \$o};
+% \item the predefined arithmetic types {\tt \$int}, {\tt \$rat}, and 
+%       {\tt \$real};
+% \item user-defined types (constants);
+% \item {\tt ($\tau_1\;$>$\;{\cdots}\;$>$\;\tau_n\;$>$\;\tilde \tau$)}
+%       for $n > 0$, where $\tau_i$ are the argument types and $\tilde \tau$
+%       is the result type.
+% \end{itemize}
+% TH0 type signatures $\varsigma$ have the following forms:
+% \begin{itemize}
+% \item individual types $\tau$.
+% \end{itemize}
+% The {\tt ($\tau_1\;$>$\;{\cdots}\;$>$\;\tau_n\;$>$\;\tilde \tau$)}
+% form is promoted to be a type in TH0 (and TH1) forms, so that variables in
+% formulae can be quantified as function types.
+% The curried form means that TH0 provides the possibility of partial
+% application.
+% As in TF0, arithmetic symbols and equality are ad hoc polymorphic.
+% The new binary connective {\tt @} represents application.
+% % (explicit use of
+% % {\tt @} is required -- symbols cannot simply be juxtaposed) -- see
+% % Figure~\ref{TH0Example} for examples.
+% There are three new binders: {\tt \verb|^|}, {\tt @+}, and {\tt @-}, for
+% $\lambda$, $\epsilon$ (indefinite description, aka choice), and $\iota$
+% (definite description).
+% Use of all the connectives as terms is also supported.
+% %  -- this is quite
+% % straightforward because connectives are equivalent (in Henkin semantics -
+% % see below) to corresponding lambda abstractions.
+% % The arithmetic predicates and functions, and the equality operator, can also
+% % be used as terms, but must be applied to a term of a known type (which must
+% % be an arithmetic type for the arithmetic symbols).
+% The semantics for TH0 is Henkin semantics with choice (Henkin semantics
+% by definition also includes Boolean and functional extensionality)
+% \cite{BBK04,Hen50}.
+% Figure~\ref{TH0Example} illustrates some TH0 formulae, whose conjecture can
+% be proved from the axioms (it is a variant of the TPTP problem
+% {\tt PUZ140\verb|^|1.p}).
 % 
 % \begin{figure}[htbp]
 % \begin{small}
 % \begin{verbatim}
 % %------------------------------------------------------------------------------
-% thf(bird_type,type,( bird: $tType )).
-% thf(tweety_type,type,( tweety: bird )).
+% thf(syrup_type,type,( syrup: $tType )).
+% thf(beverage_type,type,( beverage: $tType )).
+% thf(coffee_type,type,( coffee: beverage )).
+% thf(mix_type,type,( mix: beverage > syrup > beverage )).
+% thf(coffee_mixture_type,type,( coffee_mixture: syrup > beverage )).
+% thf(hot_type,type,( hot: beverage > $o )).
 % 
-% thf(list_type,type,( list: $tType > $tType )).
-% thf(map_type,type,( map: $tType > $tType > $tType )).
+% %----The mixture of coffee and something
+% thf(coffee_mixture_definition,definition,
+%     ( coffee_mixture = ( mix @ coffee ) )).
 % 
-% thf(bird_lookup_type,type,(
-%     bird_lookup: !>[A: $tType,B: $tType] : ( ( map @ A @ B ) > A > B ) )).
-% thf(bird_update_type,type,(
-%     bird_update: !>[A: $tType,B: $tType] :
-%                    ( ( map @ A @ B ) > A > B > ( map @ A @ B ) ) )).
-% thf(idempotent_type,type,( idempotent: !>[A: $tType] : ( ( A > A ) > $o ) )).
+% %----Any coffee mixture is hot coffee
+% thf(coffee_and_syrup_is_hot_coffee,axiom,(
+%     ! [S: syrup] : ( ( (coffee_mixture @ S) = coffee )
+%                    & ( hot @ ( coffee_mixture @ S ) )) )).
 % 
-% thf(bird_lookup_update_same,axiom,(
-%     ! [RangeType: $tType,Map: ( map @ bird @ RangeType ),
-%        Key: bird,Value: RangeType] :
-%       ( ( bird_lookup @ bird @ RangeType @
-%           ( bird_update @ bird @ RangeType @ Map @ Key @ Value ) @ Key )
-%       = Value ) )).
-% 
-% thf(idempotent_def,definition,(
-%     ! [A: $tType,F: ( A > A )] :
-%       ( ( idempotent @ A @ F )
-%       = ( ! [X: A] : ( ( F @ ( F @ X ) ) = ( F @ X ) ) ) ) )).
-% 
-% thf(higher_order_conjecture,conjecture,(
-%     ! [Value: ( list @ $i )] :
-%       ( idempotent @ ( map @ bird @ ( list @ $i ) )
-%       @ ^ [Map: ( map @ bird @ ( list @ $i ) )] :
-%           ( bird_update @ bird @ ( list @ $i ) @ Map @ tweety @ Value ) ) )).
+% %----There is some mixture of coffee and any syrup which is hot coffee
+% thf(there_is_hot_coffee,conjecture,(
+%     ? [SyrupMixer: syrup > beverage] :
+%     ! [S: syrup] :
+%     ? [B: beverage] :
+%       ( ( B = ( SyrupMixer @ S ) ) & ( B = coffee ) & ( hot @ B ) ) )).
 % %------------------------------------------------------------------------------
 % \end{verbatim}
 % \end{small}
-% \caption{TH1 Formulae}
-% \label{TH1Example}
+% \caption{TH0 Formulae}
+% \label{TH0Example}
 % \end{figure}
+% 
+% 
+% The polymorphic TH1 combines the higher-order features of TH0 
+% with the polymorphic features of TF1.
+% TH1 also adds five new polymorphic constants.
+% TH1 types $\tau$ have the following forms:
+% \begin{itemize}
+% \item the predefined types {\tt \$i} and {\tt \$o};
+% \item user-defined $n$-ary type constructors applied to $n$ type arguments;
+% \item type variables (which must be quantified by {\tt !>});
+% \item {\tt ($\tau_1\;$>$\;{\cdots}\;$>$\;\tau_n\;$>$\;\tilde \tau$)}
+%       for $n > 0$, where $\tau_i$ are the argument types and $\tilde \tau$
+%       is the result type.
+% \end{itemize}
+% TH1 type signatures $\varsigma$ have the following forms:
+% \begin{itemize}
+% \item individual types;
+% \item {\tt !>[$\alpha_1$:$\;$\$tType,$\;{\dots}\;$,$\alpha_n$:$\;$\$tType]:$\;\varsigma$}
+% \ for $n > 0$, where $\alpha_1,\dots,\alpha_n$ are distinct
+% type variables and $\varsigma$ is a type signature.
+% \end{itemize}
+% TH1 has five new polymorphic constants:
+% {\tt !!} for $\Pi$ (universal quantification),
+% {\tt ??} for $\Sigma$ (existential quantification),
+% {\tt @@+} for $\epsilon$ (indefinite description, aka choice),
+% {\tt @@-} for $\iota$ (definite description), 
+% and  
+% {\tt @=} (equality).
+% % \footnote{%
+% % {\tt !!} and {\tt ??} used to be in TH0, but they have been moved out to
+% % be in only TH1 now.}
+% Each of these must be instantiated by applying them to exactly one type 
+% argument.
+% % e.g.,\\
+% %\hspace*{1cm}{\tt ?$\;$[B:$\;$bird]$\;$:$\;$($\;$(@=$\;$@$\;$bird)$\;$@$\;$tweety$\;$@$\;$B$\;$)}.
+% An example of TH1 formulae can been found in \cite{KSR16}.
+% % Figure~\ref{TH1Example} illustrates some TH1 formulae, whose conjecture can
+% % be proved from the axioms.
+% % It declares and axiomatizes {\tt lookup} and {\tt update} operations on
+% % maps, then conjectures that {\tt update} is idempotent for certain keys and
+% % values.
+% % 
+% % \begin{figure}[htbp]
+% % \begin{small}
+% % \begin{verbatim}
+% % %------------------------------------------------------------------------------
+% % thf(bird_type,type,( bird: $tType )).
+% % thf(tweety_type,type,( tweety: bird )).
+% % 
+% % thf(list_type,type,( list: $tType > $tType )).
+% % thf(map_type,type,( map: $tType > $tType > $tType )).
+% % 
+% % thf(bird_lookup_type,type,(
+% %     bird_lookup: !>[A: $tType,B: $tType] : ( ( map @ A @ B ) > A > B ) )).
+% % thf(bird_update_type,type,(
+% %     bird_update: !>[A: $tType,B: $tType] :
+% %                    ( ( map @ A @ B ) > A > B > ( map @ A @ B ) ) )).
+% % thf(idempotent_type,type,( idempotent: !>[A: $tType] : ( ( A > A ) > $o ) )).
+% % 
+% % thf(bird_lookup_update_same,axiom,(
+% %     ! [RangeType: $tType,Map: ( map @ bird @ RangeType ),
+% %        Key: bird,Value: RangeType] :
+% %       ( ( bird_lookup @ bird @ RangeType @
+% %           ( bird_update @ bird @ RangeType @ Map @ Key @ Value ) @ Key )
+% %       = Value ) )).
+% % 
+% % thf(idempotent_def,definition,(
+% %     ! [A: $tType,F: ( A > A )] :
+% %       ( ( idempotent @ A @ F )
+% %       = ( ! [X: A] : ( ( F @ ( F @ X ) ) = ( F @ X ) ) ) ) )).
+% % 
+% % thf(higher_order_conjecture,conjecture,(
+% %     ! [Value: ( list @ $i )] :
+% %       ( idempotent @ ( map @ bird @ ( list @ $i ) )
+% %       @ ^ [Map: ( map @ bird @ ( list @ $i ) )] :
+% %           ( bird_update @ bird @ ( list @ $i ) @ Map @ tweety @ Value ) ) )).
+% % %------------------------------------------------------------------------------
+% % \end{verbatim}
+% % \end{small}
+% % \caption{TH1 Formulae}
+% % \label{TH1Example}
+% % \end{figure}
 
 %------------------------------------------------------------------------------
 \subsection{The FOOL Logic}
@@ -535,11 +525,10 @@ There is a model-preserving transformation of FOOL formulae to FOL formulae
 possible to prove FOOL formulae using a regular first-order theorem prover. 
 Formulae of FOOL can also be efficiently translated to a first-order clausal 
 normal form \cite{KK+16-GCAI}.
-
-In the following subsections we summarise the features of FOOL and illustrate
+The following describes these features of FOOL, illustrating
 them using examples taken from \cite{KK+16} and \cite{KKV18}.
 
-\subsubsection{First-class boolean sort}
+\paragraph{Boolean terms}~\\
 FOOL contains a fixed two-element type $\bool$, allows quantification over 
 variables of type $\bool$, and considers terms of type $\bool$ to be formulae. 
 Formula~\ref{eq:fool-bool-var} is a syntactically correct tautology in FOOL.
@@ -548,7 +537,7 @@ Formula~\ref{eq:fool-bool-var} is a syntactically correct tautology in FOOL.
 \end{equation}
 The existence of $\bool$ terms means that a function or a predicate can take 
 a formula as an argument, and formulae can be used as arguments to equality.
-For example, one can define the logical implication as a binary function
+For example, logical implication can be defined as a binary function
 $\mathit{impl}$ of the type $\bool \times \bool \to \bool$ using the following
 axiom.
 \begin{equation}\label{eq:fool-impl}
@@ -563,7 +552,23 @@ the type $\sigma \to \tau$ as follows.
 \mathit{impl}(P(x,y) \land P(x,z), y \eql z)
 \end{equation}
 
-\subsubsection{if-then-else expressions}
+\paragraph{Tuples}~\\
+A definition of a tuple has the form $\binding{(c_1,\ldots,c_n)}{s}$, where
+$n > 1$, $c_1,\ldots,c_n$ are constant symbols of the sorts
+$\sigma_1,\ldots,\sigma_n$, respectively, and $s$ is a tuple expression.
+A tuple expression is inductively defined to be either
+\begin{enumerate}
+  \item $(s_1,\ldots,s_n)$, where $s_1,\ldots,s_n$ are terms of the sorts
+        $\sigma_1,\ldots,\sigma_n$, respectively;
+  \item $\ite{\phi}{s_1}{s_2}$, where $\phi$ is a formula, and $s_1$ and $s_2$
+        are tuple expressions; or
+  \item $\letindef{D_1;\ldots;D_k}{s'}$, where $D_1;\ldots;D_k$ are definitions,
+        and $s'$ is a tuple expression.
+\end{enumerate}
+
+NEEDS AN EXAMPLE EVGENY
+
+\paragraph{Conditional expressions}~\\
 FOOL contains expressions of the form $\ite{\psi}{s}{t}$, where $\psi$ is a
 boolean term, and $s$ and $t$ are terms of the same sort. 
 The semantics of such expressions mirrors the semantics of conditional 
@@ -585,16 +590,17 @@ following valid property of $\mathit{max}$
 (\ite{\mathit{max}(x, y) \eql x}{x \geq y}{y \geq x}).
 \end{equation}
 
-\subsubsection{let-in expressions}
+\paragraph{Let expressions}~\\
 FOOL contains expressions of the form $\letindef{D_1;\ldots;D_k}{t}$, where
 $k > 0$, $t$ is either a term or a formula, and $D_1,\ldots,D_k$ are
 simultaneous non-recursive definitions. FOOL allows definitions of function
 symbols, predicate symbols, and tuples.
 
-A definition of a function symbol $f:\sigma_1\times\ldots\times\sigma_n\to\tau$
-has the form $\binding{f(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{s}$, where
+The definition of a function symbol 
+$f:\sigma_1\times\ldots\times\sigma_n\to\tau$ has the form 
+$\binding{f(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{s}$, where
 $n \geq 0$, and $s$ is a term of the sort $\tau$.
-The following let-in expression denotes the maximum of three integer constants
+The following let expression denotes the maximum of three integer constants
 $a$, $b$, and $c$ using a local definition of the function symbol
 $\mathit{max}$.
 \begin{equation}\label{eq:fool-let-impl}
@@ -605,10 +611,10 @@ $\mathit{max}$.
 \end{aligned}
 \end{equation}
 
-A definition of a predicate symbol $p:\sigma_1\times\ldots\times\sigma_n$ has 
+The definition of a predicate symbol $p:\sigma_1\times\ldots\times\sigma_n$ has 
 the form $\binding{p(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{\phi}$, where 
 $n \geq 0$, and $\phi$ is a formula.
-The following let-in expression denotes equivalence of two boolean constants 
+The following let expression denotes equivalence of two boolean constants 
 $A$ and $B$ using a local definition of the predicate symbol $\mathit{impl}$.
 \begin{equation}\label{eq:fool-let-impl}
 \begin{aligned}
@@ -617,36 +623,24 @@ $A$ and $B$ using a local definition of the predicate symbol $\mathit{impl}$.
 \end{aligned}
 \end{equation}
 
-A definition of a tuple has the form $\binding{(c_1,\ldots,c_n)}{s}$, where
-$n > 1$, $c_1,\ldots,c_n$ are constant symbols of the sorts
-$\sigma_1,\ldots,\sigma_n$, respectively, and $s$ is a tuple expression.
-A tuple expression is inductively defined to be either
-\begin{enumerate}
-  \item $(s_1,\ldots,s_n)$, where $s_1,\ldots,s_n$ are terms of the sorts
-        $\sigma_1,\ldots,\sigma_n$, respectively;
-  \item $\ite{\phi}{s_1}{s_2}$, where $\phi$ is a formula, and $s_1$ and $s_2$
-        are tuple expressions; or
-  \item $\letindef{D_1;\ldots;D_k}{s'}$, where $D_1;\ldots;D_k$ are definitions,
-        and $s'$ is a tuple expression.
-\end{enumerate}
-The semantics of let-in expressions in FOOL mirrors the semantics of
+The semantics of let expressions in FOOL mirrors the semantics of
 simultaneous non-recursive local definitions in programming languages. That is,
 neither of the definitions $D_1,\ldots,\allowbreak D_n$ uses function or
 predicate symbols created by any other definition. In the following example,
-constants $a$ and $b$ are swapped by a let-in expression. The resulting formula
+constants $a$ and $b$ are swapped by a let expression. The resulting formula
 is equivalent to $f(b, a)$.
 \begin{equation}\label{eq:parallel-let-example}
 \mathtt{let}\;\binding{a}{b}\,;\,\binding{b}{a}\;\mathtt{in}\;f(a, b)
 \end{equation}
 
-The main application of let-in expressions with tuple definitions is in 
+The main application of let expressions with tuple definitions is in 
 problems coming from program analysis, namely modelling of assignments
 \cite{KKV18}.
 The lefthand side of Figure~\ref{fig:simple-if} shows an example of an 
 imperative \texttt{if} statement containing assignments to integer variables, 
 and an \texttt{assert} statement. 
 This can be encoded as a FOOL formula as shown on the righthand side, using 
-let-in expressions with definitions of tuples that capture the assignments.
+let expressions with definitions of tuples that capture the assignments.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -684,28 +678,375 @@ assert x <= y;
 \section{The TFX Syntax}
 \label{TFX}
 
-Tuples, numbers, and "distinct objects" are terms but not formulae.
-All formulae are terms.  
-From the point of view of the first class boolean sort terms and formulae 
-are fully conflated.
+The TPTP syntax has been extended to provide the features of FOOL logic,
+and at the same time some of the previous weakenesses have been remedied.
+This has been achieved by conflating (with some exceptions) formulae and 
+terms. 
+Tuples have been simplified in TFF, and fully expressive tuples included in 
+TFX. 
+The old conditional expressions and let expressions from TFF have been 
+removed, and have been included elegantly as part of TFX. 
+
+\paragraph{Boolean terms}~\\
+Formulae are permitted as terms. For example~\ldots
+\begin{verbatim}
+    tff(p_type,type,p: ($i * $o * $int) > $o ).
+    tff(q_type,type,q: ($int * $i) > $o ).
+    tff(me_type,type,me: $i ).
+    tff(fool_1,axiom,! [X: $int] : p(me,! [Y: $i] : q(X,Y),27) ).
+\end{verbatim}
+\ldots~and~\ldots
+\begin{verbatim}
+    tff(p_type,type,p: $i > $o ).
+    tff(q_type,type,q: $o > $o ).
+    tff(me_type,type,me: $i ).
+    tff(fool_2,axiom,q((~p(me)) != q(me)) ).
+\end{verbatim}
+A consequence of allowing formulae as terms is that the default typing of 
+functions and predicates supported in plain TFF (functions default to 
+{\tt (\$i * \ldots * \$i) > \$i} and predicates default to 
+{\tt (\$i * \ldots * \$i) > \$o)} is not supported in TFX (as is the case 
+for THF).
+
+Note that not all terms can be used as formulae.
+Tuples, numbers, and ``distinct objects'' cannot be used as formulae.
+
+\paragraph{Boolean variables as formulae}~\\
+Variables of type {\tt \$o} can be used as formulae. For example~\ldots
+\begin{verbatim}
+    tff(implies_type,type,implies: ($o * $o) > $o).
+    tff(implies_defn,axiom, ! [X: $o,Y: $o]: (implies(X,Y) <=> ((~X) | Y)) ).
+\end{verbatim}
+
+\paragraph{Tuples}~\\
+Tuples in TFF are written in {\tt []} brackets, and can contain non-boolean 
+terms; tuples of formulae have been removed from TFF. 
+Tuples in TFX are written in {\tt []} brackets, and can contain any type of 
+term (including formulae and variables of type {\tt \$o}). 
+Signatures can contain tuple types. 
+For example~\ldots
+\begin{verbatim}
+    tff(t1_type,type,t1: $tType ).
+    tff(d_type,type,d: [$i,t1,$int] ).
+    tff(p_type,type,p: [t1,$i] > $o ).
+    tff(f_type,type,f: ($o * [$i,t1,$int]) > [t1,$i] ).
+    tff(tuples_2,axiom,p(f($true,d)) ).
+\end{verbatim}
+Tuples can occur only as terms (not as formulae, and not on the lefthand side 
+of a type declaration). 
+Tuples can occur anywhere they are well-typed. For example~\ldots
+\begin{verbatim}
+    tff(p_type,type,p: ([$int,$i,$o] * $o * $int) > $o ).
+    tff(q_type,type,q: ($int * $i) > $o ).
+    tff(me_type,type,me: $i ).
+    tff(tuples_1,axiom,! [X: $int] : p([33,me,$true],! [Y: $i] : q(X,Y),27) ).
+\end{verbatim}
+Tuples cannot be typed. Rather the elements must be typed separately. 
+For example~\ldots
+\begin{verbatim}
+    tff(a_type,type,a: $int).
+    tff(b_type,type,b: $int).
+    tff(p_type,type,p: [$int,$int] > $o).
+    tff(p,axiom,p([a,b]).
+\end{verbatim}
+\ldots~cannot be abbreviated to~\ldots
+\begin{verbatim}
+    tff(ab_type,type,[a,b]: [$int,$int]).
+    tff(p_type,type,p: [$int,$int] > $o).
+    tff(p,axiom,p([a,b]).
+\end{verbatim}
+
+\paragraph{Conditional expressions}~\\
+Conditional expressions are parametric polymorphic, taking a formula as the 
+first argument, then two terms or formulae of any one type as the second and 
+third arguments, as the true and false return values respectively, i.e., the 
+return type is the same as that of the second and third arguments. 
+For example~\ldots
+\begin{verbatim}
+    tff(p_type,type,p: $int > $o).
+    tff(q_type,type,q: $int > $o).
+    tff(max_type,type,max: ($int * $int) > $int).
+    tff(ite_1,axiom,! [X:$int,Y:$int] : $ite($greater(X,Y),p(X),p(Y)) ).
+    tff(ite_2,axiom,! [X:$int,Y:$int] : q($ite($greater(X,Y),X,Y)) ).
+    tff(max_defn,axiom,
+        ! [X: $int,Y: $int]: (max(X,Y) = $ite($greatereq(X,Y),X,Y)) ).
+    tff(max_property,axiom,
+        ! [X: $int,Y: $int]: 
+          $ite(max(X,Y) = X,$greatereq(X,Y),$greatereq(Y,X)) ).
+\end{verbatim}
+Tuples can be used usefully in conditional expressions. For example~\ldots
+\begin{verbatim}
+    tff(p_type,type,p: [$int,$int] > $o).
+    tff(d_type,type,d: [$int,$int]).
+    tff(ite_3,axiom,
+        ! [X:$int,Y:$int] : p($ite($greater(X,Y),[X,Y],[Y,X])) ).
+    tff(ite_4,axiom,
+        ! [X:$int,Y:$int] : (d = $ite($greater(X,Y),[X,Y],[Y,X])) ).
+\end{verbatim}
+
+\paragraph{Let expressions}~\\
+Let expressions provide the types of defined symbols, definitions for the 
+symbols, and a formula/term in which the definitions are applied. 
+Each type declaration is the same as a type declaration in an annotated 
+formula with the type role, and multiple type declarations are given in 
+{\tt []}ed tuples of declarations. 
+Each definition defines the expansion of one of the declared symbols, and 
+multiple definitions are given in {\tt []}ed tuples of definitions. 
+For example~\ldots
+\begin{verbatim}
+    tff(p_type,type,p: $int > $o ).
+    tff(let_1,axiom,$let(c: $int,c:= 27,p(c)) ).
+\end{verbatim}
+\ldots~is equivalent to~\ldots
+\begin{verbatim}
+    tff(p_type,type,p: $int > $o ).
+    tff(let_1,axiom,p(27) ).
+\end{verbatim}
+If variables are used in the lefthand side of a definition, their values are 
+supplied in the defined symbol's use. 
+Such variables do not need to be declared (they are implicitly declared to be 
+of the type defined by the symbol declaration), but must be top-level arguments 
+of the defined symbol and be pairwise distinct. 
+For example~\ldots
+\begin{verbatim}
+    tff(i_type,type,i: $int).
+    tff(j_type,type,j: $int).
+    tff(f_type,type,f: ($int * $int * $int * $int) > $rat).
+    tff(p_type,type,p: $rat > $o ).
+    tff(let_2,axiom,
+        $let(ff: ($int * $int) > $rat, ff(X,Y):= f(X,X,Y,Y), p(ff(i,j))) ).
+\end{verbatim}
+\ldots~is equivalent to~\ldots
+\begin{verbatim}
+    tff(i_type,type,i: $int).
+    tff(j_type,type,j: $int).
+    tff(f_type,type,f: ($int * $int * $int * $int) > $rat).
+    tff(p_type,type,p: $rat > $o ).
+    tff(let_2,axiom,p(f(i,i,j,j)) ).
+\end{verbatim}
+The defined symbols have scope over the formula/term in which the definitions 
+are applied, shadowing any definition outside the let expression. 
+The RHS of a definition can have symbols with the same name as the defined 
+symbol, but refer to symbols defined outside the let expression. 
+For example~\ldots
+\begin{verbatim}
+    tff(array_type,type,array: $int > $real).
+    tff(p_type,type,p: $real > $o).
+    tff(let_3,axiom,
+        $let(array: $int > $real,
+          array(I):= $ite(I = 3,5.2,array(I)),
+          p($sum(array(2),array(3))) ) ).
+\end{verbatim}
+\ldots~is equivalent to~\ldots
+\begin{verbatim}
+    tff(array_type,type,array: $int > $real).
+    tff(p_type,type,p: $real > $o).
+    tff(let_3,axiom,p($sum(array(2),5.2)) ).
+\end{verbatim}
+The occurrence of array in the lefthand side of the definition 
+{\tt array(I):=}, and the occurrences in the formula in which the let 
+expression is applied {\tt p(\$sum(array(2),array(3)))}, are the defined 
+symbol. 
+The occurrence in the righthand side of the definition 
+{\tt \$ite(I = 3,5,array(I))} is the globally defined symbol.
+Tuples can be used to define multiple symbols in let expressions in parallel 
+(not sequential, i.e., this is let, not let*). 
+For example~\ldots
+\begin{verbatim}
+    tff(a_type,type,a: $int).
+    tff(b_type,type,b: $int).
+    tff(p_type,type,p: ($int * $int) > $o).
+    tff(let_tuple_1,axiom,$let([a: $int,b: $int],[a:= b,b:= a],p(a,b)) ).
+\end{verbatim}
+\ldots~is equivalent to~\ldots
+\begin{verbatim}
+    tff(a_type,type,a: $int).
+    tff(b_type,type,b: $int).
+    tff(p_type,type,p: ($int * $int) > $o).
+    tff(let_tuple_1,axiom,p(b,a)).
+\end{verbatim}
+\ldots~and~\ldots
+\begin{verbatim}
+    tff(i_type,type,i: $int).
+    tff(f_type,type,f: ($int * $int * $int * $int) > $int).
+    tff(p_type,type,p: $int > $o ).
+    tff(let_tuple_2,axiom,
+        $let([ff: ($int * $int) > $int, gg: $int > $int],
+             [ff(X,Y):= f(X,X,Y,Y), gg(Z):= f(Z,Z,Z,Z)],
+             p(ff(i,gg(i)))) ).
+\end{verbatim}
+\ldots~is equivalent to~\ldots
+\begin{verbatim}
+    tff(i_type,type,i: $int).
+    tff(f_type,type,f: ($int * $int * $int * $int) > $int).
+    tff(p_type,type,p: $int > $o ).
+    tff(let_tuple_2,axiom,p(f(i,i,f(i,i,i,i),f(i,i,i,i))) ).
+\end{verbatim}
+As tuples cannot be typed~\ldots
+\begin{verbatim}
+    tff(p_type,type,p: ($int * $int) > $o).
+    tff(not_let_tuple,axiom,
+        $let([a: $int,b: $int],[a:= b,b:= a],p(a,b)) ).
+\end{verbatim}
+\ldots~cannot be abbreviated to~\ldots
+\begin{verbatim}
+    tff(p_type,type,p: ($int * $int) > $o).
+    tff(not_let_tuple,axiom,
+        $let([a,b]: [$int,$int],[a:= b,b:= a],p(a,b)) ).
+\end{verbatim}
+Sequential let expressions (let*) can be implemented by nesting. 
+For example~\ldots
+\begin{verbatim}
+    tff(i_type,type,i: $int).
+    tff(f_type,type,f: ($int * $int * $int * $int) > $int).
+    tff(p_type,type,p: $int > $o ).
+    tff(let_tuple_3,axiom,
+        $let(ff: ($int * $int) > $int,
+             ff(X,Y):= f(X,X,Y,Y),
+             $let(gg: $int > $int,gg(Z):= ff(Z,Z),p(gg(i)) ) ) ).
+\end{verbatim}
+\ldots~is equivalent to~\ldots
+\begin{verbatim}
+    tff(i_type,type,i: $int).
+    tff(f_type,type,f: ($int * $int * $int * $int) > $int).
+    tff(p_type,type,p: $int > $o ).
+    tff(let_tuple_3,axiom,p(f(i,i,i,i)) ).
+\end{verbatim}
+Tuples can be used directly in let expressions. 
+For example~\ldots
+\begin{verbatim}
+    tff(p_type,type,p: ($int * $int) > $o ).
+    tff(q_type,type,q: [$int,$int] > $o ).
+    tff(let_tuple_4,axiom,$let([a:$int,b:$int], [a,b]:= [27,28], p(a,b)) ).
+    tff(let_tuple_5,axiom,$let(d: [$int,$int], d:= [27,28],q(d)) ).
+\end{verbatim}
+\ldots~is equivalent to~\ldots
+\begin{verbatim}
+    tff(p_type,type,p: ($int * $int) > $o ).
+    tff(q_type,type,q: [$int,$int] > $o ).
+    tff(let_tuple_4,axiom,p(27,28)) ).
+    tff(let_tuple_5,axiom,q([27,28])) ).
+\end{verbatim}
+Tuples, conditional expressions, and let expressions can be mixed in useful 
+ways. 
+For example~\ldots
+
+\begin{verbatim}
+    tff(cc_type,type,cc: $int).
+    tff(dd_type,type,dd: $int).
+    tff(let_ite_1,axiom,
+        $let([aa: $int,bb: $$int],
+             [aa,bb]:= $ite($greater(cc,dd),[cc,dd],[dd,cc]),
+             p(aa,bb)) ).
+\end{verbatim}
 
 %------------------------------------------------------------------------------
-\section{Implementation and Examples}
+\section{Software Support and Examples}
 \label{ImplementationExamples}
+
+%------------------------------------------------------------------------------
+\subsection{Software for TFX}
+\label{Software}
+
+BNF, TPTP4X
+
+Vampire EVGENY
+
+%------------------------------------------------------------------------------
+\subsection{Examples}
+\label{Examples}
+
+Figure~\ref{ImplicationFunction} shows an example that uses formulae as
+terms, quantifies over boolean variables, and uses boolean equality as 
+equivalence.
+
+\begin{figure}[htbp]
+\begin{small}
+\begin{verbatim}
+%------------------------------------------------------------------------------
+tff(imply,type, imply: ( $o * $o ) > $o ).
+tff(graph,type, p: ( $i * $i ) > $o ).
+
+tff(imply_definition,axiom,
+    ! [X:$o,Y:$o] : ( imply(X,Y) = ( ~ X | Y) ) ).
+
+tff(graph_impl,axiom,
+    ! [X: $i,Y: $i] : ( p(X,Y) => f(X) = Y ) ).
+
+tff(graph_conjecture,conjecture,(
+    ! [X: $i,Y: $i,Z: $i] : imply(p(X,Y) & p(X,Z),Y = Z) )).
+%------------------------------------------------------------------------------
+\end{verbatim}
+\end{small}
+\caption{Implication is a function}
+\label{ImplicationFunction}
+\end{figure}
+
+Figure~\ref{LetITE} shows the TFX encoding of the example of 
+Figure~\ref{fig:simple-if}, with formulae to prove something EVGENY??
+
+\begin{figure}[htbp]
+\begin{small}
+\begin{verbatim}
+%------------------------------------------------------------------------------
+tff(x_less_y,axiom,
+    $let([x:$int,y:$int,t:$int],
+      $ite($greater(x,y),
+        $let(
+%------------------------------------------------------------------------------
+\end{verbatim}
+\end{small}
+\caption{Proving something}
+\label{LetITE}
+\end{figure}
+
+Figure~\ref{Truthteller} shows an example that uses formulae as terms, in
+the second arguments of the {\tt says} predicate.
+The problem is to find a model, from the it is possible to determine which
+of {\tt A},{\tt B}, or {\tt C} is tyhe only truthteller on this
+Smullyanesque island \cite{Smu78}.
+
+\begin{figure}[htbp]
+\begin{small}
+\begin{verbatim}
+%------------------------------------------------------------------------------
+tff(a_type,type, a: $i ).
+tff(b_type,type, b: $i ).
+tff(c_type,type, c: $i ).
+tff(exactly_one_truthteller_type,type, exactly_one_truthteller: $o ).
+tff(says,type, says: ( $i * $o ) > $o ).
+
+%----Each person is either a truthteller or a liar
+tff(island,axiom,
+    ! [P: $i] :
+      ( says(P: $i,$true) <~> says(P: $i,$false) ) ).
+tff(exactly_one_truthteller,axiom,
+    ( exactly_one_truthteller
+  <=> ( ? [P: $i] : says(P,$true)
+      & ! [P1: $i,P2: $i] :
+          ( ( says(P1,$true) & says(P2,$true) )
+         => P1 = P2 ) ) )).
+
+%----B said that A said that there is exactly one truthteller on the island
+tff(b_says,hypothesis, says(b,says(a,exactly_one_truthteller)) ).
+
+%----C said that what B said is false
+tff(c_says,hypothesis, says(c,says(b,$false)) ).
+%------------------------------------------------------------------------------
+\end{verbatim}
+\end{small}
+\caption{Who is the truthteller?}
+\label{Truthteller}
+\end{figure}
 
 %------------------------------------------------------------------------------
 \section{Conclusion}
 \label{Conclusion}
 
-This paper has described the polymorphic typed-higher order form (TH1)
-in the TPTP language family, which extends the monomorphic TH0 language
-with TF1-style rank-1 polymorphism.
+This paper has described 
 
 \paragraph{Acknowledgements.}
-Thanks to Jasmin Blanchette and Christoph Benzm{\"u}ller for their
-constructive input, and to Jasmin Blanchette and Andrei Paskevich for
-letting us plagerize parts of their TF1 paper \cite{BP13-TFF1}.
-Kaliszyk was supported by the Austrian Science Fund grant P26201.
+Thanks to 
 
 %------------------------------------------------------------------------------
 \bibliographystyle{plain}
