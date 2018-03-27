@@ -92,37 +92,39 @@ Originally the TPTP world supported only first-order clause normal form (CNF)
 Over the years support for full first-order form (FOF) \cite{Sut09},
 monomorphic typed first-order form (TF0) \cite{SS+12}, rank-1 polymorphic
 typed first-order form (TF1) \cite{BP13-TFF1}, monomorphic typed higher-order 
-form (TH0) \cite{SB10}, and rank-1 polymorphic typed higher-order form (TH0) 
+form (TH0) \cite{SB10}, and rank-1 polymorphic typed higher-order form (TH1) 
 \cite{KSR16}, have been added.
 (TF0 and TF1 together form the TFF language family; TH0 and TH1 together form 
 the THF language family.)
 
-Since the inception of THF and TFF there have been some features that have 
+Since the inception of TFF and THF there have been some features that have 
 received little use, and hence little attention. 
 In particular, tuples, conditional expressions (if-then-else), and let 
 expressions (let-defn-in) were neglected, and in TFF they were horribly 
 formulated with variants to distinguish between their use with formulae and 
 terms. 
-Recently conditional expressions and let expressions have become more 
+Recently, conditional expressions and let expressions have become more 
 important because of their use in software verification applications.
-In a separate development, Evgenii Kotelnikov et al. introduced the FOOL logic
-\cite{KKV15}, which extends TFF so that (i)~formulae can be used as terms 
-of the boolean type {\tt \$o}, (ii)~variables of type {\tt \$o} can be used 
-as formulae, (iii)~tuple terms and tuple types are available as first-class 
-citizens, and (iv)~conditional and let expressions are supported. 
+In an independent development, Evgenii Kotelnikov et al. introduced the FOOL 
+logic \cite{KKV15}, which extends first-order logic so that (i)~formulae can 
+be used as terms of the boolean type, (ii)~variables of the boolean type can 
+be used as formulae, (iii)~tuple terms and tuple types are available as 
+first-class citizens, and (iv)~conditional and let expressions are supported. 
 This logic can be automatically translated to ordinary many-sorted first-order
-logic \cite{KK+16-GCAI}.
+logic \cite{KKV15}.
 Features of FOOL can be used to concisely express problems coming from program
 analysis \cite{KKV18} or translated from more expressive logics.
-Conditional expressions and let expressions of FOOL resemble these features of
-the SMT-LIB language version 2 \cite{BST10}.
-The Typed First-order form eXtended (TFX) language remedies the
-old weaknesses, and incorporates the features of FOOL logic.
+Conditional expressions and let expressions of FOOL resemble those of the 
+SMT-LIB language version 2 \cite{BST10}.
+
+The TPTP's new Typed First-order form eXtended (TFX) language remedies the
+old weaknesses of TFF, and incorporates the features of FOOL logic.
 This has been achieved by conflating (with some exceptions) formulae and 
 terms, simplifying tuples in plain TFF, including fully expressive tuples in 
 TFX, removing the old conditional expressions and let expressions from 
-TFF, and including new elegant forms as part of TFX
-(this more elegant form has been mirrored in THF, as described below).
+TFF, and including new elegant forms of conditional expressions and let 
+expressions as part of TFX (this more elegant form has been mirrored in THF, 
+as described below).
 TFX is a superset of the TFF language. 
 
 This paper describes the extensions to the TFF language form that define the 
@@ -208,23 +210,24 @@ TF0 types $\tau$ have the following forms:
 User-defined types are declared (before their use) to be of the kind
 {\tt \$tType}, in annotated formulae with a {\tt type} role -- see
 Figure~\ref{TF0Example} for examples.
-All symbols share the same namespace; in particular, a type cannot have the
-same name as a function or predicate symbol.
+% All symbols share the same namespace; in particular, a type cannot have the
+% same name as a function or predicate symbol.
 TF0 type signatures $\varsigma$ have the following forms:
 \begin{itemize}
 \item individual types $\tau$;
 \item {\tt ($\tau_1\;$*$\;{\cdots}\;$*$\;\tau_n$)$\;$>$\;\tilde \tau$}
       for $n > 0$, where $\tau_i$ are the argument types, and $\tilde \tau$
       is the result type.
-      Argument types and the result type for a function cannot be
-      {\tt \$o}, and the result type for a predicate must be {\tt \$o}.
-      If $n = 1$ the parentheses are omitted.
+      % Argument types and the result type for a function cannot be
+      % {\tt \$o}, and the result type for a predicate must be {\tt \$o}.
+      % If $n = 1$ the parentheses are omitted.
 \end{itemize}
 The type signatures of uninterpreted symbols are declared like types, in
 annotated formulae with a {\tt type} role -- see Figure~\ref{TF0Example}
 for examples.
-The type of {\tt =} is ad hoc polymorphic over all types except {\tt \$o},
-with both arguments having the same type and the result type being {\tt \$o}.
+The type of {\tt =} is ad hoc polymorphic over all types except {\tt \$o} (this
+restriction is lifted in TFX), with both arguments having the same type and 
+the result type being {\tt \$o}.
 The types of arithmetic predicates and functions are ad hoc polymorphic
 over the arithmetic types; see \cite{SS+12} for details.
 Figure~\ref{TF0Example} illustrates some TF0 formulae, whose conjecture can
@@ -293,13 +296,13 @@ TF1 types $\tau$ have the following forms:
 Type constructors are declared (before their use) to be of the kind
 {\tt (\$tType$\;$*$\;{\cdots}\;$*$\;$\$tType)$\;$> \$tType}, in annotated 
 formulae with a {\tt type} role.
-The type constructor's arity is the number of ``{\tt \$tType}''s before
-the {\tt >}.
-If the arity is zero the {\tt >} is omitted, and the type constructor is
-a monomorphic user-defined type constant as in TF0, else it is polymorphic.
-If the arity is less than two the parentheses are omitted.
-In the example of Figure~\ref{TF1Example}, {\tt cup\_of} is a unary type
-constructor that is is used to construct the type {\tt cup\_of(beverage))}.
+% The type constructor's arity is the number of ``{\tt \$tType}''s before
+% the {\tt >}.
+% If the arity is zero the {\tt >} is omitted, and the type constructor is
+% a monomorphic user-defined type constant as in TF0, else it is polymorphic.
+% If the arity is less than two the parentheses are omitted.
+% In the example of Figure~\ref{TF1Example}, {\tt cup\_of} is a unary type
+% constructor that is is used to construct the type {\tt cup\_of(beverage))}.
 TF1 type signatures $\varsigma$ have the following forms:
 \begin{itemize}
 \item individual types $\tau$;
@@ -315,44 +318,45 @@ style of $\lambda\Pi$ calculi.
 It is only used at the top level in polymorphic type signatures.
 All type variables must be of type {\tt \$tType}; more complex type variables,
 e.g., {\tt \$tType$\;$>$\;$\$tType} are beyond rank-1 polymorphism.
-In the example of Figure~\ref{TF1Example}, the type signature for {\tt mixture}
-is polymorphic.
+% In the example of Figure~\ref{TF1Example}, the type signature for 
+% {\tt mixture} is polymorphic.
 As in TF0, arithmetic symbols and equality are ad hoc polymorphic.
-Figure~\ref{TF1Example} illustrates some TF1 formulae, whose conjecture can
-be proved from the axioms (it is a variant of the TPTP problem 
-{\tt PUZ139\_1.p}).
-
-\begin{figure}[htbp]
-\begin{small}
-\begin{verbatim}
-%------------------------------------------------------------------------------
-tff(beverage_type,type,( beverage: $tType )).
-tff(syrup_type,type,( syrup: $tType )).
-tff(cup_of_type,type,( cup_of: $tType > $tType )).
-tff(full_cup_type,type,( full_cup: beverage > cup_of(beverage) )).
-tff(coffee_type,type,( coffee: beverage )).
-tff(vanilla_type,type,( vanilla: syrup )).
-tff(caramel_type,type,( caramel: syrup )).
-tff(help_stay_awake_type,type,( help_stay_awake: cup_of(beverage) > $o )).
-
-tff(mixture_type,type,(
-    mixture: !>[BeverageOrSyrup: $tType] :
-               ( ( BeverageOrSyrup * syrup ) > BeverageOrSyrup ) )).
-
-%----Coffee keeps you awake
-tff(mixture_of_coffee_help_stay_awake,axiom,(
-    ! [S: syrup] : help_stay_awake(full_cup(mixture(beverage,coffee,S))) )).
-
-%----Coffee mixed with a syrup or two helps you stay awake
-tff(syrup_coffee_help_stay_awake,conjecture,(
-    help_stay_awake(full_cup(
-      mixture(beverage,coffee,mixture(syrup,caramel,vanilla)))) )).
-%------------------------------------------------------------------------------
-\end{verbatim}
-\end{small}
-\caption{TF1 Formulae}
-\label{TF1Example}
-\end{figure}
+An example of TF1 formulae can been found in \cite{KSR16}.
+% Figure~\ref{TF1Example} illustrates some TF1 formulae, whose conjecture can
+% be proved from the axioms (it is a variant of the TPTP problem 
+% {\tt PUZ139\_1.p}).
+% 
+% \begin{figure}[htbp]
+% \begin{small}
+% \begin{verbatim}
+% %------------------------------------------------------------------------------
+% tff(beverage_type,type,( beverage: $tType )).
+% tff(syrup_type,type,( syrup: $tType )).
+% tff(cup_of_type,type,( cup_of: $tType > $tType )).
+% tff(full_cup_type,type,( full_cup: beverage > cup_of(beverage) )).
+% tff(coffee_type,type,( coffee: beverage )).
+% tff(vanilla_type,type,( vanilla: syrup )).
+% tff(caramel_type,type,( caramel: syrup )).
+% tff(help_stay_awake_type,type,( help_stay_awake: cup_of(beverage) > $o )).
+% 
+% tff(mixture_type,type,(
+%     mixture: !>[BeverageOrSyrup: $tType] :
+%                ( ( BeverageOrSyrup * syrup ) > BeverageOrSyrup ) )).
+% 
+% %----Coffee keeps you awake
+% tff(mixture_of_coffee_help_stay_awake,axiom,(
+%     ! [S: syrup] : help_stay_awake(full_cup(mixture(beverage,coffee,S))) )).
+% 
+% %----Coffee mixed with a syrup or two helps you stay awake
+% tff(syrup_coffee_help_stay_awake,conjecture,(
+%     help_stay_awake(full_cup(
+%       mixture(beverage,coffee,mixture(syrup,caramel,vanilla)))) )).
+% %------------------------------------------------------------------------------
+% \end{verbatim}
+% \end{small}
+% \caption{TF1 Formulae}
+% \label{TF1Example}
+% \end{figure}
 
 %------------------------------------------------------------------------------
 \subsection{The Typed Higher-order Form THF}
@@ -382,18 +386,20 @@ formulae can be quantified as function types.
 The curried form means that TH0 provides the possibility of partial
 application.
 As in TF0, arithmetic symbols and equality are ad hoc polymorphic.
-The new binary connective {\tt @} represents application (explicit use of
-{\tt @} is required -- symbols cannot simply be juxtaposed) -- see
-Figure~\ref{TH0Example} for examples.
+The new binary connective {\tt @} represents application.
+% (explicit use of
+% {\tt @} is required -- symbols cannot simply be juxtaposed) -- see
+% Figure~\ref{TH0Example} for examples.
 There are three new binders: {\tt \verb|^|}, {\tt @+}, and {\tt @-}, for
 $\lambda$, $\epsilon$ (indefinite description, aka choice), and $\iota$
 (definite description).
-Use of all the connectives as terms is also supported -- this is quite
-straightforward because connectives are equivalent (in Henkin semantics -
-see below) to corresponding lambda abstractions.
-The arithmetic predicates and functions, and the equality operator, can also
-be used as terms, but must be applied to a term of a known type (which must
-be an arithmetic type for the arithmetic symbols).
+Use of all the connectives as terms is also supported.
+%  -- this is quite
+% straightforward because connectives are equivalent (in Henkin semantics -
+% see below) to corresponding lambda abstractions.
+% The arithmetic predicates and functions, and the equality operator, can also
+% be used as terms, but must be applied to a term of a known type (which must
+% be an arithmetic type for the arithmetic symbols).
 The semantics for TH0 is Henkin semantics with choice (Henkin semantics
 by definition also includes Boolean and functional extensionality)
 \cite{BBK04,Hen50}.
@@ -460,127 +466,119 @@ TH1 has five new polymorphic constants:
 {\tt @@+} for $\epsilon$ (indefinite description, aka choice),
 {\tt @@-} for $\iota$ (definite description), 
 and  
-{\tt @=} (equality).\footnote{%
-{\tt !!} and {\tt ??} used to be in TH0, but they have been moved out to
-be in only TH1 now.}
+{\tt @=} (equality).
+% \footnote{%
+% {\tt !!} and {\tt ??} used to be in TH0, but they have been moved out to
+% be in only TH1 now.}
 Each of these must be instantiated by applying them to exactly one type 
-argument, e.g.,\\
-\hspace*{1cm}{\tt ?$\;$[B:$\;$bird]$\;$:$\;$($\;$(@=$\;$@$\;$bird)$\;$@$\;$tweety$\;$@$\;$B$\;$)}.
-Figure~\ref{TH1Example} illustrates some TH1 formulae, whose conjecture can
-be proved from the axioms.
-It declares and axiomatizes {\tt lookup} and {\tt update} operations on
-maps, then conjectures that {\tt update} is idempotent for certain keys and
-values.
-
-\begin{figure}[htbp]
-\begin{small}
-\begin{verbatim}
-%------------------------------------------------------------------------------
-thf(bird_type,type,( bird: $tType )).
-thf(tweety_type,type,( tweety: bird )).
-
-thf(list_type,type,( list: $tType > $tType )).
-thf(map_type,type,( map: $tType > $tType > $tType )).
-
-thf(bird_lookup_type,type,(
-    bird_lookup: !>[A: $tType,B: $tType] : ( ( map @ A @ B ) > A > B ) )).
-thf(bird_update_type,type,(
-    bird_update: !>[A: $tType,B: $tType] :
-                   ( ( map @ A @ B ) > A > B > ( map @ A @ B ) ) )).
-thf(idempotent_type,type,( idempotent: !>[A: $tType] : ( ( A > A ) > $o ) )).
-
-thf(bird_lookup_update_same,axiom,(
-    ! [RangeType: $tType,Map: ( map @ bird @ RangeType ),
-       Key: bird,Value: RangeType] :
-      ( ( bird_lookup @ bird @ RangeType @
-          ( bird_update @ bird @ RangeType @ Map @ Key @ Value ) @ Key )
-      = Value ) )).
-
-thf(idempotent_def,definition,(
-    ! [A: $tType,F: ( A > A )] :
-      ( ( idempotent @ A @ F )
-      = ( ! [X: A] : ( ( F @ ( F @ X ) ) = ( F @ X ) ) ) ) )).
-
-thf(higher_order_conjecture,conjecture,(
-    ! [Value: ( list @ $i )] :
-      ( idempotent @ ( map @ bird @ ( list @ $i ) )
-      @ ^ [Map: ( map @ bird @ ( list @ $i ) )] :
-          ( bird_update @ bird @ ( list @ $i ) @ Map @ tweety @ Value ) ) )).
-%------------------------------------------------------------------------------
-\end{verbatim}
-\end{small}
-\caption{TH1 Formulae}
-\label{TH1Example}
-\end{figure}
+argument.
+% e.g.,\\
+%\hspace*{1cm}{\tt ?$\;$[B:$\;$bird]$\;$:$\;$($\;$(@=$\;$@$\;$bird)$\;$@$\;$tweety$\;$@$\;$B$\;$)}.
+An example of TH1 formulae can been found in \cite{KSR16}.
+% Figure~\ref{TH1Example} illustrates some TH1 formulae, whose conjecture can
+% be proved from the axioms.
+% It declares and axiomatizes {\tt lookup} and {\tt update} operations on
+% maps, then conjectures that {\tt update} is idempotent for certain keys and
+% values.
+% 
+% \begin{figure}[htbp]
+% \begin{small}
+% \begin{verbatim}
+% %------------------------------------------------------------------------------
+% thf(bird_type,type,( bird: $tType )).
+% thf(tweety_type,type,( tweety: bird )).
+% 
+% thf(list_type,type,( list: $tType > $tType )).
+% thf(map_type,type,( map: $tType > $tType > $tType )).
+% 
+% thf(bird_lookup_type,type,(
+%     bird_lookup: !>[A: $tType,B: $tType] : ( ( map @ A @ B ) > A > B ) )).
+% thf(bird_update_type,type,(
+%     bird_update: !>[A: $tType,B: $tType] :
+%                    ( ( map @ A @ B ) > A > B > ( map @ A @ B ) ) )).
+% thf(idempotent_type,type,( idempotent: !>[A: $tType] : ( ( A > A ) > $o ) )).
+% 
+% thf(bird_lookup_update_same,axiom,(
+%     ! [RangeType: $tType,Map: ( map @ bird @ RangeType ),
+%        Key: bird,Value: RangeType] :
+%       ( ( bird_lookup @ bird @ RangeType @
+%           ( bird_update @ bird @ RangeType @ Map @ Key @ Value ) @ Key )
+%       = Value ) )).
+% 
+% thf(idempotent_def,definition,(
+%     ! [A: $tType,F: ( A > A )] :
+%       ( ( idempotent @ A @ F )
+%       = ( ! [X: A] : ( ( F @ ( F @ X ) ) = ( F @ X ) ) ) ) )).
+% 
+% thf(higher_order_conjecture,conjecture,(
+%     ! [Value: ( list @ $i )] :
+%       ( idempotent @ ( map @ bird @ ( list @ $i ) )
+%       @ ^ [Map: ( map @ bird @ ( list @ $i ) )] :
+%           ( bird_update @ bird @ ( list @ $i ) @ Map @ tweety @ Value ) ) )).
+% %------------------------------------------------------------------------------
+% \end{verbatim}
+% \end{small}
+% \caption{TH1 Formulae}
+% \label{TH1Example}
+% \end{figure}
 
 %------------------------------------------------------------------------------
 \subsection{The FOOL Logic}
 \label{FOOL}
-FOOL~\cite{KKV15}, standing for first-order logic (FOL) + bool, is a variation
-of many-sorted first-order logic that (1) contains a boolean sort with a fixed
-interpretation, (2) treats terms of the boolean sort as formulas, (3) contains
-if-then-else expressions, and (4) contains let-in expressions with definitions
-of function symbols, predicate symbols, and tuples.
-
-There is a model-preserving transformation of FOOL formulas to FOL
-formulas~\cite{KKV15}. An implementation of this transformation makes it
-possible to prove FOOL formulas using a first-order theorem prover. Formulas of
-FOOL can also be efficiently translated to a first-order clausal normal form
-using the VCNF clasufication algorithm~\cite{KK+16-GCAI}.
+FOOL~\cite{KKV15}, standing for First-Order Logic (FOL) + bOoleans, is a 
+variation of many-sorted first-order logic in which (i)~formulae can
+be used as terms of the boolean type, (ii)~variables of the boolean type can
+be used as formulae, (iii)~tuple terms and tuple types are available as
+first-class citizens, and (iv)~conditional and let expressions are supported.
+There is a model-preserving transformation of FOOL formulae to FOL formulae
+\cite{KKV15}, so that an implementation of the transformation makes it 
+possible to prove FOOL formulae using a regular first-order theorem prover. 
+Formulae of FOOL can also be efficiently translated to a first-order clausal 
+normal form \cite{KK+16-GCAI}.
 
 In the following subsections we summarise the features of FOOL and illustrate
 them using examples taken from \cite{KK+16} and \cite{KKV18}.
 
 \subsubsection{First-class boolean sort}
-FOOL contains a fixed two-element first class sort $\bool$ and considers terms
-of the $\bool$ sort to be formulas.
-
-FOOL allows quantification over $\bool$ and usage of boolean variables as
-formulas. Formula~\ref{eq:fool-bool-var} is a syntactically correct tautology
-in FOOL.
+FOOL contains a fixed two-element type $\bool$, allows quantification over 
+variables of type $\bool$, and considers terms of type $\bool$ to be formulae. 
+Formula~\ref{eq:fool-bool-var} is a syntactically correct tautology in FOOL.
 \begin{equation}\label{eq:fool-bool-var}
 (\forall x:\bool)(x \lor \neg x)
 \end{equation}
-
-FOOL allows functions and predicates to take booleans as arguments. For
-example, one can define the logical implication as a binary function
+The existence of $\bool$ terms means that a function or a predicate can take 
+a formula as an argument, and formulae can be used as arguments to equality.
+For example, one can define the logical implication as a binary function
 $\mathit{impl}$ of the type $\bool \times \bool \to \bool$ using the following
 axiom.
 \begin{equation}\label{eq:fool-impl}
 (\forall x:\bool)(\forall y:\bool)(\mathit{impl}(x,y) \liff \neg x \lor y).
 \end{equation}
-
-Unlike the standard FOL, FOOL does not make a distinction between formulas and
-boolean terms. It means that a function or a predicate can take a formula as a
-boolean argument, and formulas can be used as arguments to equality between
-booleans. For example, with the definition of $\mathit{impl}$, given earlier,
-we can express in FOOL that $P$ is a graph of a (partial) function of the type
-$\sigma \to \tau$ as follows.
+Formula \ref{eq:fool-impl} can be equivalently expressed with $\eql$ instead of
+$\liff$.
+Then it is possible to express that $P$ is a graph of a (partial) function of 
+the type $\sigma \to \tau$ as follows.
 \begin{equation}\label{eq:bool-arg-example}
 (\forall x:\sigma)(\forall y:\tau)(\forall z:\tau)
 \mathit{impl}(P(x,y) \land P(x,z), y \eql z)
 \end{equation}
 
-Formula \ref{eq:fool-impl} can be equivalently expressed with $\eql$ instead of
-$\liff$.
-
 \subsubsection{if-then-else expressions}
 FOOL contains expressions of the form $\ite{\psi}{s}{t}$, where $\psi$ is a
-boolean term, and $s$ and $t$ are terms of the same sort. The semantics of such
-expressions mirrors the semantics of conditional expressions in programming
-languages.
-
-if-then-else expressions are convenient for expressing formulas coming from
-program analysis and interactive theorem provers. For example, consider the
-$\mathit{max}$ function of the type $\mathds{Z}\times\mathds{Z}\to\mathds{Z}$
-that returns the maximum of its arguments. Its definition can be expressed in
-FOOL as
+boolean term, and $s$ and $t$ are terms of the same sort. 
+The semantics of such expressions mirrors the semantics of conditional 
+expressions in programming languages, and are therefore convenient for 
+expressing formulae coming from program analysis. 
+For example, consider the $\mathit{max}$ function of the type 
+$\mathds{Z}\times\mathds{Z}\to\mathds{Z}$ that returns the maximum of its 
+arguments. 
+Its definition can be expressed in FOOL as
 \begin{equation}\label{eq:ite-t-example}
 (\forall x:\mathds{Z})(\forall y:\mathds{Z})
 (\mathit{max}(x, y) \eql \ite{x \geq y}{x}{y}).
 \end{equation}
 
-FOOL allows if-then-else expressions to occur as formulas, like in the
+FOOL allows if-then-else expressions to occur as formulae, as in the
 following valid property of $\mathit{max}$
 \begin{equation}\label{eq:ite-f-example}
 (\forall x:\mathds{Z})(\forall y:\mathds{Z})
@@ -593,11 +591,9 @@ $k > 0$, $t$ is either a term or a formula, and $D_1,\ldots,D_k$ are
 simultaneous non-recursive definitions. FOOL allows definitions of function
 symbols, predicate symbols, and tuples.
 
-\paragraph{Definitions of function symbols}
-Definition of a function symbol $f:\sigma_1\times\ldots\times\sigma_n\to\tau$
+A definition of a function symbol $f:\sigma_1\times\ldots\times\sigma_n\to\tau$
 has the form $\binding{f(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{s}$, where
 $n \geq 0$, and $s$ is a term of the sort $\tau$.
-
 The following let-in expression denotes the maximum of three integer constants
 $a$, $b$, and $c$ using a local definition of the function symbol
 $\mathit{max}$.
@@ -609,11 +605,9 @@ $\mathit{max}$.
 \end{aligned}
 \end{equation}
 
-\paragraph{Definitions of predicate symbols}
-Definition of a predicate symbol $p:\sigma_1\times\ldots\times\sigma_n$ has the
-form $\binding{p(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{\phi}$, where $n \geq 0$,
-and $\phi$ is a formula.
-
+A definition of a predicate symbol $p:\sigma_1\times\ldots\times\sigma_n$ has 
+the form $\binding{p(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{\phi}$, where 
+$n \geq 0$, and $\phi$ is a formula.
 The following let-in expression denotes equivalence of two boolean constants 
 $A$ and $B$ using a local definition of the predicate symbol $\mathit{impl}$.
 \begin{equation}\label{eq:fool-let-impl}
@@ -623,8 +617,7 @@ $A$ and $B$ using a local definition of the predicate symbol $\mathit{impl}$.
 \end{aligned}
 \end{equation}
 
-\paragraph{Definitions of tuples}
-Definition of a tuple has the form $\binding{(c_1,\ldots,c_n)}{s}$, where
+A definition of a tuple has the form $\binding{(c_1,\ldots,c_n)}{s}$, where
 $n > 1$, $c_1,\ldots,c_n$ are constant symbols of the sorts
 $\sigma_1,\ldots,\sigma_n$, respectively, and $s$ is a tuple expression.
 A tuple expression is inductively defined to be either
@@ -636,53 +629,6 @@ A tuple expression is inductively defined to be either
   \item $\letindef{D_1;\ldots;D_k}{s'}$, where $D_1;\ldots;D_k$ are definitions,
         and $s'$ is a tuple expression.
 \end{enumerate}
-
-The main application of let-in expressions with tuple definitions is in problems
-coming from program analysis, namely modelling of assignments~\cite{KKV18}.
-Figure~\ref{fig:boogie/simple-if} shows an example of an imperative program
-with assignments to integer variable, an \texttt{if} statement, and an
-\texttt{assert} statement. One can encode the \texttt{assert} condition as a
-FOOL formula (Figure~\ref{fig:boogie/simple-if-fool}) using let-in expressions
-with definitions of tuples that capture variables updated in different branches
-of the \texttt{if} statement.
-\begin{figure}
-  \quad\qquad\qquad
-  \parbox{4.5cm}{
-    \vspace{1em}
-    \begin{center}
-    \begin{tabular}{c}
-    \begin{lstlisting}^^J
-if (x > y) \{^^J
-\ \ t := x;^^J
-\ \ x := y;^^J
-\ \ y := t;^^J
-\}^^J
-assert x <= y;^^J
-    \end{lstlisting}
-    \end{tabular}
-    \end{center}
-    \vspace{1em}
-    \caption{An imperative program with an \texttt{if} statement.}
-    \label{fig:boogie/simple-if}
-  }
-\qquad
-  \begin{minipage}{6cm}
-\[
-  \letnl{(x,y,t)}{\itenll{x > y}
-                 {\letinnl{t}{x}
-                          {\letinnl{x}{y}
-                                   {\letinnl{y}{t}
-                                            {(x,y,t)}}}}
-                 {(x,y,t)}}
-        {x \le y}
-\]
-    \caption{A FOOL encoding of the program assertion on
-    Figure~\ref{fig:boogie/simple-if}.}
-    \label{fig:boogie/simple-if-fool}
-  \end{minipage}
-\vspace{-1.5em}
-\end{figure}
-
 The semantics of let-in expressions in FOOL mirrors the semantics of
 simultaneous non-recursive local definitions in programming languages. That is,
 neither of the definitions $D_1,\ldots,\allowbreak D_n$ uses function or
@@ -693,13 +639,54 @@ is equivalent to $f(b, a)$.
 \mathtt{let}\;\binding{a}{b}\,;\,\binding{b}{a}\;\mathtt{in}\;f(a, b)
 \end{equation}
 
+The main application of let-in expressions with tuple definitions is in 
+problems coming from program analysis, namely modelling of assignments
+\cite{KKV18}.
+The lefthand side of Figure~\ref{fig:simple-if} shows an example of an 
+imperative \texttt{if} statement containing assignments to integer variables, 
+and an \texttt{assert} statement. 
+This can be encoded as a FOOL formula as shown on the righthand side, using 
+let-in expressions with definitions of tuples that capture the assignments.
+
+\begin{figure}[htbp]
+\begin{center}
+\begin{tabular}[t]{ll}
+\begin{minipage}{0.3\textwidth}
+\begin{verbatim}
+if (x > y) 
+    t := x;
+    x := y;
+    y := t;
+
+assert x <= y;
+\end{verbatim}
+\end{minipage}
+&
+\begin{minipage}{0.3\textwidth}
+\[
+  \letnl{(x,y,t)}{\itenll{x > y}
+                 {\letinnl{t}{x}
+                          {\letinnl{x}{y}
+                                   {\letinnl{y}{t}
+                                            {(x,y,t)}}}}
+                 {(x,y,t)}}
+        {x \le y}
+\]
+\end{minipage}
+\\
+\end{tabular}
+\end{center}
+\caption{FOOL encoding of an {\tt if} statement}
+\label{fig:simple-if}
+\end{figure}
+
 %------------------------------------------------------------------------------
 \section{The TFX Syntax}
 \label{TFX}
 
 Tuples, numbers, and "distinct objects" are terms but not formulae.
 All formulae are terms.  
-From the point of view of the first class boolean sort terms and formulas 
+From the point of view of the first class boolean sort terms and formulae 
 are fully conflated.
 
 %------------------------------------------------------------------------------
