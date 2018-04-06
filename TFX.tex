@@ -964,11 +964,17 @@ For example~\ldots
 
 BNF, TPTP4X
 
-Vampire EVGENY
+The Vampire theorem prover~\cite{KV13} supports all features of FOOL and can
+read the TFX syntax. Vampire transforms FOOL formulae into a set of first-order
+clauses using the VCNF algorithm~\cite{KK+16-GCAI} and then reasons with these
+clauses using its normal resolution calculi for first-order logic.
 
-Voogie EVGENY
-
-Mention BLT \cite{CF17}
+TFX have been used by two recent program verification tools BLT~\cite{CF17} and
+Voogie~\cite{KKV18}. Both BLT and Voogie read programs written in a subset of
+the Boogie intermediate verification language and generate their partial
+correctness properties written in the TFX syntax. BLT and Voogie generate
+formulae differently, but both rely on features of FOOL, namely conditional
+expressions, let expressions, and tuples.
 
 %------------------------------------------------------------------------------
 \subsection{Examples}
