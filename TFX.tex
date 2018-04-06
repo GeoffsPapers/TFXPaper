@@ -949,7 +949,7 @@ For example~\ldots
     tff(cc_type,type,cc: $int).
     tff(dd_type,type,dd: $int).
     tff(let_ite_1,axiom,
-        $let([aa: $int,bb: $$int],
+        $let([aa: $int,bb: $int],
              [aa,bb]:= $ite($greater(cc,dd),[cc,dd],[dd,cc]),
              p(aa,bb)) ).
 \end{verbatim}
@@ -1000,21 +1000,31 @@ tff(graph_conjecture,conjecture,(
 \label{ImplicationFunction}
 \end{figure}
 
-Figure~\ref{LetITE} shows the TFX encoding of the example of 
-Figure~\ref{fig:simple-if}, with formulae to prove something EVGENY??
+Figure~\ref{LetITE} shows the TFX encoding of the FOOL formula on
+Figure~\ref{fig:simple-if} that expresses a partial correctness property of an
+imperative program with an \texttt{if} statement.
 
 \begin{figure}[htbp]
 \begin{small}
 \begin{verbatim}
 %------------------------------------------------------------------------------
-tff(x_less_y,axiom,
+tff(x,type,x:$int).
+tff(y,type,y:$int).
+tff(t,type,t:$int).
+tff(x_leq_y,conjecture,
     $let([x:$int,y:$int,t:$int],
-      $ite($greater(x,y),
-        $let(
+         [x,y,t] := $ite($greater(x,y),
+                         $let(t:$int, t := x,
+                         $let(x:$int, x := y,
+                         $let(y:$int, y := t,
+                              [x,y,t]))),
+                         [x,y,t]),
+         $lesseq(x,y))).
 %------------------------------------------------------------------------------
 \end{verbatim}
 \end{small}
-\caption{Proving something}
+\caption{A TFX encoding of a program analysis problem on Figure
+\ref{fig:simple-if}.}
 \label{LetITE}
 \end{figure}
 
