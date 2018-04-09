@@ -56,7 +56,7 @@ the THF language family.
 Since the inception of TFF there have been some features that have received 
 little use, and hence little attention, such as tuples, conditional 
 expressions (if-then-else), and let expressions. 
-This paper introduces the Typed First-order form eXtended (TFX) which extends
+This paper introduces the Typed First-order eXtended form (TFX), which extends
 TFF to include these and other features. 
 \end{abstract}
 
@@ -977,19 +977,27 @@ For example~\ldots
 \subsection{Software for TFX}
 \label{Software}
 
-BNF, TPTP4X
+The grammar for THX is captured in version v7.1.0.2 of the TPTP syntax,
+available online at \url{http://www.tptp.org/TPTP/SyntaxBNF.html}.
+This provides the automatically generated lex/yacc parsers for TPTP files.
+At the time of writing this paper, the TPTP4X utility is being upgraded
+to support TFX.
+The Vampire theorem prover \cite{KV13} supports all features of FOOL,
+EVGENY IS THIS TRUE? I THOUGHT ONLY YOPUR SPECIAL VERSION. CERTAINLY VAMPIRE
+4.2 (FROM CASC) DOES NOT SUPPORT THE TFX SYNTAX.
+and can
+read the TFX syntax. 
+Vampire transforms FOOL formulae into a set of first-order clauses using the 
+VCNF algorithm~\cite{KK+16-GCAI} and then reasons with these clauses using 
+its normal resolution calculi for first-order logic.
 
-The Vampire theorem prover~\cite{KV13} supports all features of FOOL and can
-read the TFX syntax. Vampire transforms FOOL formulae into a set of first-order
-clauses using the VCNF algorithm~\cite{KK+16-GCAI} and then reasons with these
-clauses using its normal resolution calculi for first-order logic.
-
-TFX have been used by two recent program verification tools BLT~\cite{CF17} and
-Voogie~\cite{KKV18}. Both BLT and Voogie read programs written in a subset of
-the Boogie intermediate verification language and generate their partial
-correctness properties written in the TFX syntax. BLT and Voogie generate
-formulae differently, but both rely on features of FOOL, namely conditional
-expressions, let expressions, and tuples.
+TFX has been used by two recent program verification tools BLT~\cite{CF17} and
+Voogie~\cite{KKV18}. 
+Both BLT and Voogie read programs written in a subset of the Boogie 
+intermediate verification language and generate their partial correctness 
+properties written in the TFX syntax. 
+BLT and Voogie generate formulae differently, but both rely on features of 
+FOOL, namely conditional expressions, let expressions, and tuples.
 
 %------------------------------------------------------------------------------
 \subsection{Examples}
@@ -1092,10 +1100,26 @@ tff(c_says,hypothesis, says(c,says(b,$false)) ).
 \section{Conclusion}
 \label{Conclusion}
 
-This paper has described 
+This paper has introduced the Typed First-order eXtended form (TFX) of the
+TPTP's TFF syntax.
+TFX includes formulae as terms, use of variables of the boolean type as
+formulae, tuple terms and tuple types, conditional expressions,
+and let expressions.
+TFX is usefule for (at least) concisely expressing problems coming from 
+program analysis, and translated from more expressive logics.
+
+Now that the syntax is settled, ATP system developers will be able to
+implement the new language features.
+It is already apparent from the SMT community that these are useful features,
+and systems that can already parse the SMT syntax need only new parsers (for
+TFX syntax) to implement the features.
+In parallel, version v8.0.0 of the TPTP will include problems that use TFX,
+and the automated reasoning community is invited to submit problems for
+inclusion in the TPTP.
 
 \paragraph{Acknowledgements.}
-Thanks to 
+Thanks to our friends in the TPTP World, who have provided feedback on TFX
+features, starting from the TPTP Tea Party at CADE-22 in 2009!
 
 %------------------------------------------------------------------------------
 \bibliographystyle{plain}
