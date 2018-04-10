@@ -708,15 +708,30 @@ is equivalent to $f(b, a)$.
 \label{TFX}
 
 The TPTP syntax has been extended to provide the features of FOOL logic,
-and at the same time some of the previous weakenesses have been remedied.
+and at the same time some of the previous weaknesses have been remedied.
 Formulae and term have been conflated (with some exceptions).
 Tuples have been simplified in TFF, and fully expressive tuples included in 
 TFX. 
 The old conditional expressions and let expressions from TFF have been 
 removed, and new elegant forms have been included as part of TFX. 
+The grammar of THX is captured in version v7.1.0.2 of the TPTP syntax,
+available online at \url{http://www.tptp.org/TPTP/SyntaxBNF.html}.
+In the subsections below, the relevant excerpts of the BNF are provided,
+with examples and commentary.
 
-\paragraph{Boolean terms}~\\
-Formulae are permitted as terms. For example~\ldots
+%------------------------------------------------------------------------------
+\subsection{Boolean terms}
+
+Formulae are permitted as terms. 
+The BNF excerpt is~\ldots
+\begin{verbatim}
+<tff_logic_formula>    ::= <tff_unitary_formula> | <tff_unary_formula> |
+                           <tff_binary_formula> | <tff_defined_infix>
+<tff_term>             ::= <tff_logic_formula> | <defined_term> | <tfx_tuple>
+<tff_unitary_term>     ::= <tff_atomic_formula> | <defined_term> |
+                           <tfx_tuple> | <variable> | (<tff_logic_formula>)
+\end{verbatim}
+For example~\ldots
 \begin{verbatim}
     tff(p_type,type,p: ($i * $o * $int) > $o ).
     tff(q_type,type,q: ($int * $i) > $o ).
@@ -739,19 +754,35 @@ for THF).
 Note that not all terms can be used as formulae.
 Tuples, numbers, and ``distinct objects'' cannot be used as formulae.
 
-\paragraph{Boolean variables as formulae}~\\
-Variables of type {\tt \$o} can be used as formulae. For example~\ldots
+%------------------------------------------------------------------------------
+\subsection{Boolean variables as formulae}
+
+Variables of type {\tt \$o} can be used as formulae. 
+The BNF excerpt is~\ldots
+\begin{verbatim}
+<tff_unitary_formula>  ::= <tff_quantified_formula> | <tff_atomic_formula> |
+                           <tfx_unitary_formula> | (<tff_logic_formula>)
+<tfx_unitary_formula>  ::= <variable>
+\end{verbatim}
+For example~\ldots
 \begin{verbatim}
     tff(implies_type,type,implies: ($o * $o) > $o).
     tff(implies_defn,axiom, ! [X: $o,Y: $o]: (implies(X,Y) <=> ((~X) | Y)) ).
 \end{verbatim}
 
-\paragraph{Tuples}~\\
+%------------------------------------------------------------------------------
+\subsection{Tuples}
+
 Tuples in TFF are written in {\tt []} brackets, and can contain only
 non-boolean terms -- tuples of formulae have been removed from TFF. 
 Tuples in TFX are written in {\tt []} brackets, and can contain any type of 
 term (including formulae and variables of type {\tt \$o}). 
 Signatures can contain tuple types. 
+The BNF excerpt is~\ldots
+\begin{verbatim}
+<tfx_tuple>            ::= [] | [<tff_arguments>]
+<tff_arguments>        ::= <tff_term> | <tff_term>,<tff_arguments>
+\end{verbatim}
 For example~\ldots
 \begin{verbatim}
     tff(t1_type,type,t1: $tType ).
@@ -784,11 +815,17 @@ For example~\ldots
     tff(p,axiom,p([a,b]).
 \end{verbatim}
 
-\paragraph{Conditional expressions}~\\
+%------------------------------------------------------------------------------
+\subsection{Conditional expressions}
+
 Conditional expressions are parametric polymorphic, taking a formula as the 
 first argument, then two terms or formulae of any one type as the second and 
 third arguments, as the true and false return values respectively, i.e., the 
 return type is the same as that of the second and third arguments. 
+The BNF excerpt is~\ldots
+\begin{verbatim}
+<tfx_conditional>      ::= $ite(<tff_logic_formula>,<tff_term>,<tff_term>)
+\end{verbatim}
 For example~\ldots
 \begin{verbatim}
     tff(p_type,type,p: $int > $o).
@@ -812,12 +849,25 @@ Tuples can be used usefully in conditional expressions. For example~\ldots
         ! [X:$int,Y:$int] : d = $ite($greater(X,Y),[X,Y],[Y,X]) ).
 \end{verbatim}
 
-\paragraph{Let expressions}~\\
+%------------------------------------------------------------------------------
+\subsection{Let expressions}
+
 Let expressions provide the types of defined symbols, definitions for the 
 symbols, and a formula/term in which the definitions are applied. 
 Each type declaration is the same as a type declaration in an annotated 
 formula with the type role.
 Each definition defines the expansion of one of the declared symbols.
+The BNF excerpt is~\ldots
+\begin{verbatim}
+<tfx_let>              ::= $let(<tfx_let_types>,<tfx_let_defns>,<tff_term>)
+<tfx_let_types>        ::= <tff_atom_typing> | [<tff_atom_typing_list>]
+<tff_atom_typing_list> ::= <tff_atom_typing> |
+                           <tff_atom_typing>,<tff_atom_typing_list>
+<tfx_let_defns>        ::= <tfx_let_defn> | [<tfx_let_defn_list>]
+<tfx_let_defn>         ::= <tfx_let_LHS> <assignment> <tff_term>
+<tfx_let_LHS>          ::= <tff_plain_atomic> | <tfx_tuple>
+<tfx_let_defn_list>    ::= <tfx_let_defn> | <tfx_let_defn>,<tfx_let_defn_list>
+\end{verbatim}
 For example~\ldots
 \begin{verbatim}
     tff(p_type,type,p: $int > $o ).
@@ -956,19 +1006,6 @@ For example~\ldots
     tff(let_tuple_4,axiom,p(27,28)) ).
     tff(let_tuple_5,axiom,q([27,28])) ).
 \end{verbatim}
-Tuples, conditional expressions, and let expressions can be mixed in useful 
-ways. 
-For example~\ldots
-
-\begin{verbatim}
-    tff(cc_type,type,cc: $int).
-    tff(dd_type,type,dd: $int).
-    tff(let_ite_1,axiom,
-        $let([aa: $int,bb: $int],
-             [aa,bb]:= $ite($greater(cc,dd),[cc,dd],[dd,cc]),
-             p(aa,bb)) ).
-\end{verbatim}
-
 %------------------------------------------------------------------------------
 \section{Software Support and Examples}
 \label{ImplementationExamples}
@@ -977,9 +1014,7 @@ For example~\ldots
 \subsection{Software for TFX}
 \label{Software}
 
-The grammar for THX is captured in version v7.1.0.2 of the TPTP syntax,
-available online at \url{http://www.tptp.org/TPTP/SyntaxBNF.html}.
-This provides the automatically generated lex/yacc parsers for TPTP files.
+The BNF provides the automatically generated lex/yacc parsers for TPTP files.
 At the time of writing this paper, the TPTP4X utility is being upgraded
 to support TFX.
 The Vampire theorem prover \cite{KV13} supports all features of FOOL,
@@ -1029,6 +1064,29 @@ tff(graph_conjecture,conjecture,(
 \label{ImplicationFunction}
 \end{figure}
 
+Figure~\ref{TupleConditionalLet} shows how tuples, conditional expressions, 
+and let expressions can be mixed in useful ways, here to place two integer
+values in descending order as arguments in an atom.
+
+\begin{figure}[htbp]
+\begin{small}
+\begin{verbatim}
+%------------------------------------------------------------------------------
+tff(v1_type,type,v1: $int).
+
+tff(v2_type,type,v2: $int).
+
+tff(ordered_p,axiom,
+    $let([large: $int,small: $int],
+         [large,small]:= $ite($greater(v1,v2),[v1,v2],[v2,v1]),
+         p(large,small)) ).
+%------------------------------------------------------------------------------
+\end{verbatim}
+\end{small}
+\caption{MMMMM}
+\label{TupleConditionalLet}
+\end{figure}
+
 Figure~\ref{LetITE} shows the TFX encoding of the FOOL formula on
 Figure~\ref{fig:simple-if} that expresses a partial correctness property of an
 imperative program with an \texttt{if} statement.
@@ -1060,7 +1118,7 @@ tff(x_leq_y,conjecture,
 Figure~\ref{Truthteller} shows an example that uses formulae as terms, in
 the second arguments of the {\tt says} predicate.
 The problem is to find a model, from the it is possible to determine which
-of {\tt A},{\tt B}, or {\tt C} is tyhe only truthteller on this
+of {\tt A},{\tt B}, or {\tt C} is the only truthteller on this
 Smullyanesque island \cite{Smu78}.
 
 \begin{figure}[htbp]
@@ -1105,7 +1163,7 @@ TPTP's TFF syntax.
 TFX includes formulae as terms, use of variables of the boolean type as
 formulae, tuple terms and tuple types, conditional expressions,
 and let expressions.
-TFX is usefule for (at least) concisely expressing problems coming from 
+TFX is useful for (at least) concisely expressing problems coming from 
 program analysis, and translated from more expressive logics.
 
 Now that the syntax is settled, ATP system developers will be able to
