@@ -721,41 +721,6 @@ In the subsections below, the relevant excerpts of the BNF are provided,
 with examples and commentary.
 
 %------------------------------------------------------------------------------
-\subsection{Boolean terms}
-
-Formulae are permitted as terms. 
-The BNF excerpt is~\ldots
-\begin{verbatim}
-<tff_logic_formula>    ::= <tff_unitary_formula> | <tff_unary_formula> |
-                           <tff_binary_formula> | <tff_defined_infix>
-<tff_term>             ::= <tff_logic_formula> | <defined_term> | <tfx_tuple>
-<tff_unitary_term>     ::= <tff_atomic_formula> | <defined_term> |
-                           <tfx_tuple> | <variable> | (<tff_logic_formula>)
-\end{verbatim}
-For example~\ldots
-\begin{verbatim}
-    tff(p_type,type,p: ($i * $o * $int) > $o ).
-    tff(q_type,type,q: ($int * $i) > $o ).
-    tff(me_type,type,me: $i ).
-    tff(fool_1,axiom,! [X: $int] : p(me,! [Y: $i] : q(X,Y),27) ).
-\end{verbatim}
-\ldots~and~\ldots
-\begin{verbatim}
-    tff(p_type,type,p: $i > $o ).
-    tff(q_type,type,q: $i > $o ).
-    tff(me_type,type,me: $i ).
-    tff(fool_2,axiom,q((~p(me)) != q(me)) ).
-\end{verbatim}
-A consequence of allowing formulae as terms is that the default typing of 
-functions and predicates supported in plain TFF (functions default to 
-{\tt (\$i * \ldots * \$i) > \$i} and predicates default to 
-{\tt (\$i * \ldots * \$i) > \$o)} is not supported in TFX (as is the case 
-for THF).
-
-Note that not all terms can be used as formulae.
-Tuples, numbers, and ``distinct objects'' cannot be used as formulae.
-
-%------------------------------------------------------------------------------
 \subsection{Boolean variables as formulae}
 
 Variables of type {\tt \$o} can be used as formulae. 
@@ -765,11 +730,68 @@ The BNF excerpt is~\ldots
                            <tfx_unitary_formula> | (<tff_logic_formula>)
 <tfx_unitary_formula>  ::= <variable>
 \end{verbatim}
-For example~\ldots
+
+For example, Formula~\ref{eq:fool-bool-var} can be written in the TFX syntax as
+follows.
 \begin{verbatim}
-    tff(implies_type,type,implies: ($o * $o) > $o).
-    tff(implies_defn,axiom, ! [X: $o,Y: $o]: (implies(X,Y) <=> ((~X) | Y)) ).
+    tff(tautology,conjecture,! [X: $o]: (X | (~X)) ).
 \end{verbatim}
+
+The type of the $\mathit{impl}$ predicate can be written in the TFX syntax as
+\verb'($o * $o) > $o' and its definition in Formula~\ref{eq:fool-impl} can be
+written as follows.
+\begin{verbatim}
+    tff(impl_type,type,impl: ($o * $o) > $o ).
+    tff(impl_defn,axiom, ! [X: $o,Y: $o]: (impl(X,Y) <=> ((~X) | Y)) ).
+\end{verbatim}
+
+Notice that the negation of a boolean variable used as a formula must be
+placed inside parenthesis.
+
+%------------------------------------------------------------------------------
+\subsection{Formulae as boolean terms}
+
+Formulae can be used as boolean terms. 
+The BNF excerpt is~\ldots
+\begin{verbatim}
+<tff_logic_formula>    ::= <tff_unitary_formula> | <tff_unary_formula> |
+                           <tff_binary_formula> | <tff_defined_infix>
+<tff_term>             ::= <tff_logic_formula> | <defined_term> | <tfx_tuple>
+<tff_unitary_term>     ::= <tff_atomic_formula> | <defined_term> |
+                           <tfx_tuple> | <variable> | (<tff_logic_formula>)
+\end{verbatim}
+
+Formula~\ref{eq:bool-arg-example} can be written in TFX as follows.
+\begin{verbatim}
+    tff(s,type,s: $tType).
+    tff(t,type,t: $tType).
+    tff(p,type,p: (s * t) > $o ).
+    tff(graph,axiom,
+        ! [X: s,Y: t,Z: s] : impl(p(X,Y) & p(X,Z), Y = Z) ).
+\end{verbatim}
+% For example~\ldots
+% \begin{verbatim}
+%     tff(p_type,type,p: ($i * $o * $int) > $o ).
+%     tff(q_type,type,q: ($int * $i) > $o ).
+%     tff(me_type,type,me: $i ).
+%     tff(fool_1,axiom,! [X: $int] : p(me,! [Y: $i] : q(X,Y),27) ).
+% \end{verbatim}
+% \ldots~and~\ldots
+% \begin{verbatim}
+%     tff(p_type,type,p: $i > $o ).
+%     tff(q_type,type,q: $i > $o ).
+%     tff(me_type,type,me: $i ).
+%     tff(fool_2,axiom,q((~p(me)) != q(me)) ).
+% \end{verbatim}
+
+A consequence of allowing formulae as terms is that the default typing of 
+functions and predicates supported in plain TFF (functions default to 
+{\tt (\$i * \ldots * \$i) > \$i} and predicates default to 
+{\tt (\$i * \ldots * \$i) > \$o)} is not supported in TFX (as is the case 
+for THF).
+
+Note that not all terms can be used as formulae.
+Tuples, numbers, and ``distinct objects'' cannot be used as formulae.
 
 %------------------------------------------------------------------------------
 \subsection{Tuples}
@@ -781,17 +803,25 @@ term (including formulae and variables of type {\tt \$o}).
 Signatures can contain tuple types. 
 The BNF excerpt is~\ldots
 \begin{verbatim}
+<tfx_tuple_type>       ::= [<tff_type_list>]
+<tff_type_list>        ::= <tff_top_level_type> |
+                           <tff_top_level_type>,<tff_type_list>
+
 <tfx_tuple>            ::= [] | [<tff_arguments>]
 <tff_arguments>        ::= <tff_term> | <tff_term>,<tff_arguments>
 \end{verbatim}
-For example~\ldots
-\begin{verbatim}
-    tff(t1_type,type,t1: $tType ).
-    tff(d_type,type,d: [$i,t1,$int] ).
-    tff(p_type,type,p: [t1,$i] > $o ).
-    tff(f_type,type,f: ($o * [$i,t1,$int]) > [t1,$i] ).
-    tff(tuples_2,axiom,p(f($true,d)) ).
-\end{verbatim}
+
+The tuple type $\tuple{\mathds{R},\mathds{R}}$ can be written in the TFX syntax as \verb|[$real,$real]| and the type of the addition function for complex numbers $\tuple{\mathds{R},\mathds{R}} \times \tuple{\mathds{R},\mathds{R}} \to \tuple{\mathds{R},\mathds{R}}$ can be written as
+\verb'([$real,$real] * [$real,$real]) > [$real,$real]'. The tuple term $\tuple{2,3}$ can be written as \verb'[2,3]'.
+
+% For example~\ldots
+% \begin{verbatim}
+%     tff(t1_type,type,t1: $tType ).
+%     tff(d_type,type,d: [$i,t1,$int] ).
+%     tff(p_type,type,p: [t1,$i] > $o ).
+%     tff(f_type,type,f: ($o * [$i,t1,$int]) > [t1,$i] ).
+%     tff(tuples_2,axiom,p(f($true,d)) ).
+% \end{verbatim}
 Tuples can occur only as terms (not as formulae, and not on the lefthand side 
 of a type declaration), anywhere they are well-typed. 
 For example~\ldots
@@ -806,14 +836,10 @@ For example~\ldots
 \begin{verbatim}
     tff(a_type,type,a: $int).
     tff(b_type,type,b: $int).
-    tff(p_type,type,p: [$int,$int] > $o).
-    tff(p,axiom,p([a,b]).
 \end{verbatim}
 \ldots~cannot be abbreviated to~\ldots
 \begin{verbatim}
     tff(ab_type,type,[a,b]: [$int,$int]).
-    tff(p_type,type,p: [$int,$int] > $o).
-    tff(p,axiom,p([a,b]).
 \end{verbatim}
 
 %------------------------------------------------------------------------------
@@ -825,19 +851,22 @@ third arguments. The type of the conditional expression is the type of its secon
 \begin{verbatim}
 <tfx_conditional>      ::= $ite(<tff_logic_formula>,<tff_term>,<tff_term>)
 \end{verbatim}
-For example~\ldots
+
+Formulas~\ref{eq:ite-t-example} and \ref{eq:ite-f-example} can be expressed in
+TFX as follows.
 \begin{verbatim}
-    tff(p_type,type,p: $int > $o).
-    tff(q_type,type,q: $int > $o).
     tff(max_type,type,max: ($int * $int) > $int).
-    tff(ite_1,axiom,! [X:$int,Y:$int] : $ite($greater(X,Y),p(X),p(Y)) ).
-    tff(ite_2,axiom,! [X:$int,Y:$int] : q($ite($greater(X,Y),X,Y)) ).
     tff(max_defn,axiom,
         ! [X: $int,Y: $int]: max(X,Y) = $ite($greatereq(X,Y),X,Y) ).
-    tff(max_property,axiom,
+    tff(max_property,conjecture,
         ! [X: $int,Y: $int]: 
           $ite(max(X,Y) = X,$greatereq(X,Y),$greatereq(Y,X)) ).
 \end{verbatim}
+
+We use the keyword \verb'$ite' for conditional expressions occurring both as
+terms and formulas. This is different from the old TFF syntax of if-then-else
+that contained two separate keywords \verb'$ite_t' and \verb'$ite_f'.
+
 Tuples can be used usefully in conditional expressions. For example~\ldots
 \begin{verbatim}
     tff(p_type,type,p: [$int,$int] > $o).
