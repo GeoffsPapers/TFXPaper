@@ -125,16 +125,17 @@ logic~\cite{KKV15}, a variation of many-sorted first-order logic (FOL).
 FOOL extends the ordinary FOL in that it (i)~contains an interpreted boolean
 sort and allows formulae to be used as boolean terms, (ii)~allows boolean
 variables to be used as formulae, (iii)~contains conditional expressions, and
-(iv)~contains let expresisons with definitions of function symbols, predicate
-symbols, and tuples. FOOL can be extended with the theory of tuples~\cite{KKV18}
-that contains first class tuple terms and first class tuple types. Features of
-FOOL can be used to concisely express problems coming from program
-analysis~\cite{KKV18} or translated from more expressive logics. Conditional
-expressions and let expressions of FOOL resemble those of the SMT-LIB language
-version 2~\cite{BST10}.
+(iv)~contains let expressions with definitions of function symbols, predicate
+symbols, and tuples. 
+FOOL can be extended with the theory of tuples~\cite{KKV18}
+that contains first class tuple terms and first class tuple types. 
+Features of FOOL can be used to concisely express problems coming from program
+analysis~\cite{KKV18} or translated from more expressive logics. 
+Conditional expressions and let expressions of FOOL resemble those of the 
+SMT-LIB language version 2~\cite{BST10}.
 
 The TPTP's new Typed First-order form eXtended (TFX) language remedies the
-old weaknesses of TFF, and incorporates the features of FOOL logic.
+old weaknesses of TFF, and incorporates the features of FOOL.
 This has been achieved by conflating (with some exceptions) formulae and 
 terms, simplifying tuples in plain TFF, including fully expressive tuples in 
 TFX, removing the old conditional expressions and let expressions from 
@@ -146,7 +147,7 @@ TFX is a superset of the TFF language.
 This paper describes the extensions to the TFF language form that define the 
 TFX language.
 The remainder of this paper is organized as follows:
-Section~\ref{TPTPFOOL} reviews the TFF language, and describes the FOOL logic.
+Section~\ref{TPTPFOOL} reviews the TFF language, and describes the FOOL.
 Section~\ref{TFX} provides technical and syntax details of the new features 
 of TFX.
 Section~\ref{ImplementationExamples} describes the evolving software 
@@ -533,18 +534,20 @@ FOOL \cite{KKV15}, standing for First-Order Logic (FOL) + bOoleans, is a
 variation of many-sorted first-order logic. FOOL extends the ordinary FOL in
 that it (i)~contains an interpreted boolean sort and allows formulae to be used
 as boolean terms, (ii)~allows boolean variables to be used as formulae,
-(iii)~contains conditional expressions, and (iv)~contains let expresisons with
-definitions of function symbols, predicate symbols, and tuples. FOOL can be
-straightforwardly extended with the polymorphic theory of tuples~\cite{KKV18}
-and in what follows we consider such extension. This theory includes first
-class tuples type and first class tuple terms. The syntax for first class tuple
-terms and tuple types is part of TFX as well. There is a model-preserving
-transformation of FOOL formulae to FOL formulae~\cite{KKV15}, so that an
-implementation of the transformation makes it possible to reason about FOOL
-formulae using a regular first-order theorem prover. Formulae of FOOL can also
-be efficiently translated to a first-order clausal normal
-form~\cite{KK+16-GCAI}. The following describes these features of FOOL,
-illustrating them using examples taken from \cite{KK+16} and \cite{KKV18}.
+(iii)~contains conditional expressions, and (iv)~contains let expressions with
+definitions of function symbols, predicate symbols, and tuples. 
+FOOL can be straightforwardly extended with the polymorphic theory of 
+tuples \cite{KKV18}, and in what follows we consider that extension. 
+This theory includes first class tuples type and first class tuple terms. 
+First class tuple terms and tuple types are part of TFX as well. 
+There is a model-preserving transformation of FOOL formulae to FOL formulae
+\cite{KKV15}, so that an implementation of the transformation makes it 
+possible to reason about FOOL formulae using a regular first-order theorem 
+prover. 
+Formulae of FOOL can also be efficiently translated to a first-order clausal 
+normal form~\cite{KK+16-GCAI}. 
+The following describes these features of FOOL, illustrating them using 
+examples taken from \cite{KK+16} and \cite{KKV18}.
 
 \subsubsection*{Boolean terms}
 FOOL contains a fixed two-element type $\bool$, allows quantification over 
@@ -708,7 +711,7 @@ is equivalent to $f(b, a)$.
 \section{The TFX Syntax}
 \label{TFX}
 
-The TPTP syntax has been extended to provide the features of FOOL logic,
+The TPTP syntax has been extended to provide the features of FOOL,
 and at the same time some of the previous weaknesses have been remedied.
 Formulae and term have been conflated (with some exceptions).
 Tuples have been simplified in TFF, and fully expressive tuples included in 
@@ -1046,14 +1049,15 @@ The BNF provides the automatically generated lex/yacc parsers for TPTP files.
 At the time of writing this paper, the TPTP4X utility is being upgraded
 to support TFX.
 
-The Vampire theorem prover \cite{KV13} supports all features of FOOL. Vampire
-transforms FOOL formulae into a set of first-order clauses using the VCNF
-algorithm~\cite{KK+16-GCAI} and then reasons with these clauses using its usual
-resolution calculi for first-order logic. At the time of writing this paper,
-the latest released version of Vampire 4.2.2 uses the syntax for FOOL that
-slightly differs from TFX. The full support of the TFX syntax has been
-implemented in the recent revisions of the Vampire source
-code~\footnote{\url{https://github.com/vprover/vampire}} and will be available
+The Vampire theorem prover \cite{KV13} supports all features of FOOL. 
+Vampire transforms FOOL formulae into a set of first-order clauses using the 
+VCNF algorithm \cite{KK+16-GCAI}, and then reasons with these clauses using 
+its usual resolution calculi for first-order logic. 
+At the time of writing this paper the latest released version of Vampire,
+4.2.2, uses a syntax for FOOL that slightly differs from TFX. 
+Full support for the TFX syntax has been implemented in a recent revision of 
+the Vampire source code~\footnote{%
+\url{https://github.com/vprover/vampire}}, and will be available
 in the next release of Vampire.
 
 TFX has been used by two program verification tools BLT~\cite{CF17} and
@@ -1113,13 +1117,13 @@ tff(ordered_p,axiom,
 %------------------------------------------------------------------------------
 \end{verbatim}
 \end{small}
-\caption{MMMMM}
+\caption{Mixing tuples, conditional and let expressions}
 \label{TupleConditionalLet}
 \end{figure}
 
-Figure~\ref{LetITE} shows the TFX encoding of the FOOL formula on
-Figure~\ref{fig:simple-if} that expresses a partial correctness property of an
-imperative program with an \texttt{if} statement.
+Figure~\ref{LetITE} shows the TFX encoding of the FOOL formula in
+Figure~\ref{fig:simple-if}, which expresses a partial correctness property 
+of an imperative program with an \texttt{if} statement.
 
 \begin{figure}[htbp]
 \begin{small}
