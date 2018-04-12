@@ -587,8 +587,11 @@ $\tuple{\sigma_1,\ldots,\sigma_n}$. Each tuple term is first class and can be us
 
 Tuples are ubiquitous in mathematics and programming languages. For example,
 one can use the tuple sort $\tuple{\mathds{R},\mathds{R}}$ as the sort of
-complex numbers. Thus, the term $\tuple{2,3}$ represents the complex number
-$2+3i$. A function symbol $\mathit{plus}$ which represents addition of complex numbers has the type $\tuple{\mathds{R},\mathds{R}} \times \tuple{\mathds{R},\mathds{R}} \to \tuple{\mathds{R},\mathds{R}}$.
+complex numbers. 
+Thus the term $\tuple{2,3}$ represents the complex number $2+3i$. 
+A function symbol $\mathit{plus}$ that represents addition of complex numbers 
+has the type $\tuple{\mathds{R},\mathds{R}} \times 
+\tuple{\mathds{R},\mathds{R}} \to \tuple{\mathds{R},\mathds{R}}$.
 
 \subsubsection*{Conditional expressions}
 FOOL contains expressions of the form $\ite{\psi}{s}{t}$, where $\psi$ is a
@@ -907,7 +910,8 @@ If variables are used in the lefthand side of a definition, their values are
 supplied in the defined symbol's use. 
 Such variables do not need to be declared (they are implicitly declared to be 
 of the type defined by the symbol declaration), but must be top-level arguments 
-of the defined symbol and be pairwise distinct. Thus, the expression~\ref{eq:fool-let-impl} can be written in the TFX syntax as follows.
+of the defined symbol and be pairwise distinct. 
+Thus Formula~\ref{eq:fool-let-impl} can be written in TFX syntax as:
 \begin{verbatim}
 $let(max: ($real * $real) > $real,
      max(X,Y):= $ite($greatereq(X,Y),X,Y),
@@ -932,13 +936,13 @@ $let(max: ($real * $real) > $real,
 % tff(let_2,axiom,p(f(i,i,j,j)) ).
 % \end{verbatim}
 
-And Formula~\ref{eq:fool-let-impl2} can be written in the TFX syntax as follows.
+Similarly, Formula~\ref{eq:fool-let-impl2} can be written in TFX syntax as:
 \begin{verbatim}
 tff(a,type,a: $o).
 tff(b,type,b: $o).
 tff(a_eq_b,axiom,
     $let(impl: ($o * $o) > $o,
-         impl(X,Y):= (~X) | Y,
+         impl(X,Y):= ~X | Y,
          impl(a,b) & impl(b,a)) ).
 \end{verbatim}
 
@@ -977,7 +981,8 @@ The occurrence in the righthand side of the definition
 
 Let expressions can use simultaneous local definitions
 (Lisp-like programming languages would have called them \verb'let' and not \verb'let*').
-Both the type declarations and the definitions are given in {\tt []}es. Thus, the expression \ref{eq:parallel-let-example} can be written in the TFX syntax as follows.
+Both the type declarations and the definitions are given in {\tt []}es. 
+Thus Formula~\ref{eq:parallel-let-example} can be written in the TFX syntax as:
 \begin{verbatim}
 tff(a,type,a: $i).
 tff(b,type,b: $i).
@@ -1073,9 +1078,10 @@ Formula~\ref{eq:fool-tuple-let} can be written in the TFX syntax as follows.
 tff(plus,type,plus: ([$real,$real] * [$real,$real]) > [$real,$real]).
 tff(plus_def,axiom,
     ! [X: [$real,$real],Y: [$real$,$real]] :
-      plus(X,Y) = $let([[a,b]: [$real,$real],[c,d]: [$real,$real]],
-                       [[a,b]:= X, [c,d]:= Y],
-                       [$sum(a,c),$sum(b,d)]) ).
+      ( plus(X,Y) 
+      = $let([a: $real,b: $real,c: $real,d: $real],
+             [[a,b]:= X, [c,d]:= Y],
+             [$sum(a,c),$sum(b,d)]) ).
 \end{verbatim}
 
 %------------------------------------------------------------------------------
@@ -1113,7 +1119,11 @@ FOOL, namely conditional expressions, let expressions, and tuples.
 \subsection{Examples}
 \label{Examples}
 
-Tuples can be used usefully in conditional expressions. For example~\ldots
+Figure~\ref{TupleConditional} shows how tuples can be used usefully in 
+conditional expressions. 
+
+\begin{figure}[htbp]
+\begin{small}
 \begin{verbatim}
 tff(p_type,type,p: [$int,$int] > $o).
 tff(d_type,type,d: [$int,$int]).
@@ -1122,33 +1132,10 @@ tff(ite_3,axiom,
 tff(ite_4,axiom,
     ! [X:$int,Y:$int] : d = $ite($greater(X,Y),[X,Y],[Y,X]) ).
 \end{verbatim}
-
-% EK: this example is used earlier in the TFX syntax section
-% Figure~\ref{ImplicationFunction} shows an example that uses formulae as
-% terms, quantifies over boolean variables, and uses boolean equality as 
-% equivalence.
-
-% \begin{figure}[htbp]
-% \begin{small}
-% \begin{verbatim}
-% %------------------------------------------------------------------------------
-% tff(imply,type, imply: ( $o * $o ) > $o ).
-% tff(graph,type, p: ( $i * $i ) > $o ).
-
-% tff(imply_definition,axiom,
-% ! [X:$o,Y:$o] : ( imply(X,Y) = ( ~ X | Y) ) ).
-
-% tff(graph_impl,axiom,
-% ! [X: $i,Y: $i] : ( p(X,Y) => f(X) = Y ) ).
-
-% tff(graph_conjecture,conjecture,(
-% ! [X: $i,Y: $i,Z: $i] : imply(p(X,Y) & p(X,Z),Y = Z) )).
-% %------------------------------------------------------------------------------
-% \end{verbatim}
-% \end{small}
-% \caption{Implication is a function}
-% \label{ImplicationFunction}
-% \end{figure}
+\end{small}
+\caption{Tuples in conditional expressions}
+\label{TupleConditional}
+\end{figure}
 
 Figure~\ref{TupleConditionalLet} shows how tuples, conditional expressions, 
 and let expressions can be mixed in useful ways, here to place two integer
