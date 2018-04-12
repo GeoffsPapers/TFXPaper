@@ -738,7 +738,7 @@ The BNF excerpt is~\ldots
 For example, Formula~\ref{eq:fool-bool-var} can be written in the TFX syntax as
 follows.
 \begin{verbatim}
-tff(tautology,conjecture,! [X: $o]: (X | (~X)) ).
+tff(tautology,conjecture,! [X: $o]: (X | ~X) ).
 \end{verbatim}
 
 The type of the $\mathit{impl}$ predicate can be written in the TFX syntax as
@@ -746,7 +746,7 @@ The type of the $\mathit{impl}$ predicate can be written in the TFX syntax as
 written as follows.
 \begin{verbatim}
 tff(impl_type,type,impl: ($o * $o) > $o ).
-tff(impl_defn,axiom, ! [X: $o,Y: $o]: (impl(X,Y) <=> ((~X) | Y)) ).
+tff(impl_defn,axiom, ! [X: $o,Y: $o]: (impl(X,Y) <=> (~X | Y)) ).
 \end{verbatim}
 
 Notice that the negation of a boolean variable used as a formula must be
@@ -868,8 +868,8 @@ tff(max_property,conjecture,
       $ite(max(X,Y) = X,$greatereq(X,Y),$greatereq(Y,X)) ).
 \end{verbatim}
 
-We use the keyword \verb'$ite' for conditional expressions occurring both as
-terms and formulae. This is different from the old TFF syntax of if-then-else
+The keyword \verb'$ite' is used for conditional expressions occurring both as
+terms and formulae, which is different from the old TFF syntax of if-then-else
 that contained two separate keywords \verb'$ite_t' and \verb'$ite_f'.
 
 %------------------------------------------------------------------------------
@@ -942,8 +942,12 @@ tff(a_eq_b,axiom,
          impl(a,b) & impl(b,a)) ).
 \end{verbatim}
 
-We use the keyword \verb'$let' for let expressions defining both function and predicate symbols. We use \verb'$let' regardless of whether a let expression occurs as a term or a formula. This is different from the old TFF syntax of let expressions
-that contained four separate keywords \verb'$let_tt', \verb'$let_tf', \verb'$let_ft', and \verb'$let_ff'.
+The keyword \verb'$let' is used for let expressions defining both function and 
+predicate symbols, regardless of whether the let expression occurs as a term 
+or a formula. 
+This is different from the old TFF syntax of let expressions that contained 
+four separate keywords \verb'$let_tt', \verb'$let_tf', \verb'$let_ft', and 
+\verb'$let_ff'.
 
 The defined symbols have scope over the formula/term in which the definitions 
 are applied, shadowing any definition outside the let expression. 
