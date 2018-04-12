@@ -637,7 +637,7 @@ the form $\binding{p(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{\phi}$, where
 $n \geq 0$, and $\phi$ is a formula.
 The following let expression denotes equivalence of two boolean constants 
 $A$ and $B$ using a local definition of the predicate symbol $\mathit{impl}$.
-\begin{equation}\label{eq:fool-let-impl}
+\begin{equation}\label{eq:fool-let-impl2}
 \begin{aligned}
 \mathtt{let}\;&\binding{\mathit{impl}(x:\bool,y:\bool)}{\neg x \lor y}\\
  \mathtt{in}\;&\mathit{impl}(A,B)\wedge\mathit{impl}(B,A)
@@ -737,15 +737,15 @@ The BNF excerpt is~\ldots
 For example, Formula~\ref{eq:fool-bool-var} can be written in the TFX syntax as
 follows.
 \begin{verbatim}
-    tff(tautology,conjecture,! [X: $o]: (X | (~X)) ).
+tff(tautology,conjecture,! [X: $o]: (X | (~X)) ).
 \end{verbatim}
 
 The type of the $\mathit{impl}$ predicate can be written in the TFX syntax as
 \verb'($o * $o) > $o' and its definition in Formula~\ref{eq:fool-impl} can be
 written as follows.
 \begin{verbatim}
-    tff(impl_type,type,impl: ($o * $o) > $o ).
-    tff(impl_defn,axiom, ! [X: $o,Y: $o]: (impl(X,Y) <=> ((~X) | Y)) ).
+tff(impl_type,type,impl: ($o * $o) > $o ).
+tff(impl_defn,axiom, ! [X: $o,Y: $o]: (impl(X,Y) <=> ((~X) | Y)) ).
 \end{verbatim}
 
 Notice that the negation of a boolean variable used as a formula must be
@@ -766,25 +766,25 @@ The BNF excerpt is~\ldots
 
 Formula~\ref{eq:bool-arg-example} can be written in TFX as follows.
 \begin{verbatim}
-    tff(s,type,s: $tType).
-    tff(t,type,t: $tType).
-    tff(p,type,p: (s * t) > $o ).
-    tff(graph,axiom,
-        ! [X: s,Y: t,Z: s] : impl(p(X,Y) & p(X,Z), Y = Z) ).
+tff(s,type,s: $tType).
+tff(t,type,t: $tType).
+tff(p,type,p: (s * t) > $o ).
+tff(graph,axiom,
+    ! [X: s,Y: t,Z: s] : impl(p(X,Y) & p(X,Z), Y = Z) ).
 \end{verbatim}
 % For example~\ldots
 % \begin{verbatim}
-%     tff(p_type,type,p: ($i * $o * $int) > $o ).
-%     tff(q_type,type,q: ($int * $i) > $o ).
-%     tff(me_type,type,me: $i ).
-%     tff(fool_1,axiom,! [X: $int] : p(me,! [Y: $i] : q(X,Y),27) ).
+% tff(p_type,type,p: ($i * $o * $int) > $o ).
+% tff(q_type,type,q: ($int * $i) > $o ).
+% tff(me_type,type,me: $i ).
+% tff(fool_1,axiom,! [X: $int] : p(me,! [Y: $i] : q(X,Y),27) ).
 % \end{verbatim}
 % \ldots~and~\ldots
 % \begin{verbatim}
-%     tff(p_type,type,p: $i > $o ).
-%     tff(q_type,type,q: $i > $o ).
-%     tff(me_type,type,me: $i ).
-%     tff(fool_2,axiom,q((~p(me)) != q(me)) ).
+% tff(p_type,type,p: $i > $o ).
+% tff(q_type,type,q: $i > $o ).
+% tff(me_type,type,me: $i ).
+% tff(fool_2,axiom,q((~p(me)) != q(me)) ).
 % \end{verbatim}
 
 A consequence of allowing formulae as terms is that the default typing of 
@@ -819,30 +819,31 @@ The tuple type $\tuple{\mathds{R},\mathds{R}}$ can be written in the TFX syntax 
 
 % For example~\ldots
 % \begin{verbatim}
-%     tff(t1_type,type,t1: $tType ).
-%     tff(d_type,type,d: [$i,t1,$int] ).
-%     tff(p_type,type,p: [t1,$i] > $o ).
-%     tff(f_type,type,f: ($o * [$i,t1,$int]) > [t1,$i] ).
-%     tff(tuples_2,axiom,p(f($true,d)) ).
+% tff(t1_type,type,t1: $tType ).
+% tff(d_type,type,d: [$i,t1,$int] ).
+% tff(p_type,type,p: [t1,$i] > $o ).
+% tff(f_type,type,f: ($o * [$i,t1,$int]) > [t1,$i] ).
+% tff(tuples_2,axiom,p(f($true,d)) ).
 % \end{verbatim}
 Tuples can occur only as terms (not as formulae, and not on the lefthand side 
 of a type declaration), anywhere they are well-typed. 
 For example~\ldots
 \begin{verbatim}
-    tff(p_type,type,p: ([$int,$i,$o] * $o * $int) > $o ).
-    tff(q_type,type,q: ($int * $i) > $o ).
-    tff(me_type,type,me: $i ).
-    tff(tuples_1,axiom,! [X: $int] : p([33,me,$true],! [Y: $i] : q(X,Y),27) ).
+tff(p_type,type,p: ([$int,$i,$o] * $o * $int) > $o ).
+tff(q_type,type,q: ($int * $i) > $o ).
+tff(me_type,type,me: $i ).
+tff(tuples_1,axiom,! [X: $int] : p([33,me,$true],! [Y: $i] : q(X,Y),27) ).
 \end{verbatim}
+
 Tuples cannot be typed. Rather the elements must be typed separately. 
 For example~\ldots
 \begin{verbatim}
-    tff(a_type,type,a: $int).
-    tff(b_type,type,b: $int).
+tff(a_type,type,a: $int).
+tff(b_type,type,b: $int).
 \end{verbatim}
 \ldots~cannot be abbreviated to~\ldots
 \begin{verbatim}
-    tff(ab_type,type,[a,b]: [$int,$int]).
+tff(ab_type,type,[a,b]: [$int,$int]).
 \end{verbatim}
 
 %------------------------------------------------------------------------------
@@ -855,30 +856,20 @@ third arguments. The type of the conditional expression is the type of its secon
 <tfx_conditional>      ::= $ite(<tff_logic_formula>,<tff_term>,<tff_term>)
 \end{verbatim}
 
-Formulas~\ref{eq:ite-t-example} and \ref{eq:ite-f-example} can be expressed in
+Formulae~\ref{eq:ite-t-example} and \ref{eq:ite-f-example} can be expressed in
 TFX as follows.
 \begin{verbatim}
-    tff(max_type,type,max: ($int * $int) > $int).
-    tff(max_defn,axiom,
-        ! [X: $int,Y: $int]: max(X,Y) = $ite($greatereq(X,Y),X,Y) ).
-    tff(max_property,conjecture,
-        ! [X: $int,Y: $int]: 
-          $ite(max(X,Y) = X,$greatereq(X,Y),$greatereq(Y,X)) ).
+tff(max_type,type,max: ($int * $int) > $int).
+tff(max_defn,axiom,
+    ! [X: $int,Y: $int]: max(X,Y) = $ite($greatereq(X,Y),X,Y) ).
+tff(max_property,conjecture,
+    ! [X: $int,Y: $int]: 
+      $ite(max(X,Y) = X,$greatereq(X,Y),$greatereq(Y,X)) ).
 \end{verbatim}
 
 We use the keyword \verb'$ite' for conditional expressions occurring both as
-terms and formulas. This is different from the old TFF syntax of if-then-else
+terms and formulae. This is different from the old TFF syntax of if-then-else
 that contained two separate keywords \verb'$ite_t' and \verb'$ite_f'.
-
-Tuples can be used usefully in conditional expressions. For example~\ldots
-\begin{verbatim}
-    tff(p_type,type,p: [$int,$int] > $o).
-    tff(d_type,type,d: [$int,$int]).
-    tff(ite_3,axiom,
-        ! [X:$int,Y:$int] : p($ite($greater(X,Y),[X,Y],[Y,X])) ).
-    tff(ite_4,axiom,
-        ! [X:$int,Y:$int] : d = $ite($greater(X,Y),[X,Y],[Y,X]) ).
-\end{verbatim}
 
 %------------------------------------------------------------------------------
 \subsection{Let expressions}
@@ -899,57 +890,79 @@ The BNF excerpt is~\ldots
 <tfx_let_LHS>          ::= <tff_plain_atomic> | <tfx_tuple>
 <tfx_let_defn_list>    ::= <tfx_let_defn> | <tfx_let_defn>,<tfx_let_defn_list>
 \end{verbatim}
-For example~\ldots
+
+In the following example an integer constant {\tt c} is defined in a let expression.
 \begin{verbatim}
-    tff(p_type,type,p: $int > $o ).
-    tff(let_1,axiom,$let(c: $int,c:= 27,p(c)) ).
+tff(p_type,type,p: ($int * $int) > $o ).
+tff(let_1,axiom,$let(c: $int,c:= $sum(2,3),p(c,c)) ).
 \end{verbatim}
-\ldots~is equivalent to~\ldots
-\begin{verbatim}
-    tff(p_type,type,p: $int > $o ).
-    tff(let_1,axiom,p(27) ).
-\end{verbatim}
+% \ldots~is equivalent to~\ldots
+% \begin{verbatim}
+% tff(p_type,type,p: $int > $o ).
+% tff(let_1,axiom,p(27) ).
+% \end{verbatim}
+
 If variables are used in the lefthand side of a definition, their values are 
 supplied in the defined symbol's use. 
 Such variables do not need to be declared (they are implicitly declared to be 
 of the type defined by the symbol declaration), but must be top-level arguments 
-of the defined symbol and be pairwise distinct. 
-For example~\ldots
+of the defined symbol and be pairwise distinct. Thus, the expression~\ref{eq:fool-let-impl} can be written in the TFX syntax as follows.
 \begin{verbatim}
-    tff(i_type,type,i: $int).
-    tff(j_type,type,j: $int).
-    tff(f_type,type,f: ($int * $int * $int * $int) > $rat).
-    tff(p_type,type,p: $rat > $o ).
-    tff(let_2,axiom,
-        $let(ff: ($int * $int) > $rat, ff(X,Y):= f(X,X,Y,Y), p(ff(i,j))) ).
+$let(max: ($real * $real) > $real,
+     max(X,Y):= $ite($greatereq(X,Y),X,Y),
+     max(max(a,b),c) )
 \end{verbatim}
-\ldots~is equivalent to~\ldots
+
+% For example~\ldots
+% \begin{verbatim}
+% tff(i_type,type,i: $int).
+% tff(j_type,type,j: $int).
+% tff(f_type,type,f: ($int * $int * $int * $int) > $rat).
+% tff(p_type,type,p: $rat > $o ).
+% tff(let_2,axiom,
+%     $let(ff: ($int * $int) > $rat, ff(X,Y):= f(X,X,Y,Y), p(ff(i,j))) ).
+% \end{verbatim}
+% \ldots~is equivalent to~\ldots
+% \begin{verbatim}
+% tff(i_type,type,i: $int).
+% tff(j_type,type,j: $int).
+% tff(f_type,type,f: ($int * $int * $int * $int) > $rat).
+% tff(p_type,type,p: $rat > $o ).
+% tff(let_2,axiom,p(f(i,i,j,j)) ).
+% \end{verbatim}
+
+And Formula~\ref{eq:fool-let-impl2} can be written in the TFX syntax as follows.
 \begin{verbatim}
-    tff(i_type,type,i: $int).
-    tff(j_type,type,j: $int).
-    tff(f_type,type,f: ($int * $int * $int * $int) > $rat).
-    tff(p_type,type,p: $rat > $o ).
-    tff(let_2,axiom,p(f(i,i,j,j)) ).
+tff(a,type,a: $o).
+tff(b,type,b: $o).
+tff(a_eq_b,axiom,
+    $let(impl: ($o * $o) > $o,
+         impl(X,Y):= (~X) | Y,
+         impl(a,b) & impl(b,a)) ).
 \end{verbatim}
+
+We use the keyword \verb'$let' for let expressions defining both function and predicate symbols. We use \verb'$let' regardless of whether a let expression occurs as a term or a formula. This is different from the old TFF syntax of let expressions
+that contained four separate keywords \verb'$let_tt', \verb'$let_tf', \verb'$let_ft', and \verb'$let_ff'.
+
 The defined symbols have scope over the formula/term in which the definitions 
 are applied, shadowing any definition outside the let expression. 
 The RHS of a definition can have symbols with the same name as the defined 
-symbol, but refer to symbols defined outside the let expression. 
-For example~\ldots
+symbol, but refer to symbols defined outside the let expression. In the following example the local definition of the {\tt array} function symbols shadow the global declaration.
 \begin{verbatim}
-    tff(array_type,type,array: $int > $real).
-    tff(p_type,type,p: $real > $o).
-    tff(let_3,axiom,
-        $let(array: $int > $real,
-          array(I):= $ite(I = 3,5.2,array(I)),
-          p($sum(array(2),array(3))) ) ).
+tff(array_type,type,array: $int > $real).
+tff(p_type,type,p: $real > $o).
+tff(let_3,axiom,
+    $let(array: $int > $real,
+         array(I):= $ite(I = 3,5.2,array(I)),
+         p($sum(array(2),array(3))) ) ).
 \end{verbatim}
-\ldots~is equivalent to~\ldots
-\begin{verbatim}
-    tff(array_type,type,array: $int > $real).
-    tff(p_type,type,p: $real > $o).
-    tff(let_3,axiom,p($sum(array(2),5.2)) ).
-\end{verbatim}
+% \ldots~is equivalent to~\ldots
+% \begin{verbatim}
+% tff(array_type,type,array: $int > $real).
+% tff(p_type,type,p: $real > $o).
+% tff(let_3,axiom,p($sum(array(2),5.2)) ).
+% \end{verbatim}
+
 The occurrence of array in the lefthand side of the definition 
 {\tt array(I):=}, and the occurrences in the formula in which the let 
 expression is applied {\tt p(\$sum(array(2),array(3)))}, are the defined 
@@ -957,86 +970,109 @@ symbol.
 The occurrence in the righthand side of the definition 
 {\tt \$ite(I = 3,5,array(I))} is the globally defined symbol.
 
-Tuples can be used to define multiple symbols in let expressions in parallel 
-(not sequential, i.e., this is let, not let*). 
-Multiple type declarations are given in {\tt []}ed tuples of declarations, and 
-multiple definitions are given in {\tt []}ed tuples of definitions. 
-For example~\ldots
+Let expressions can use simultaneous local definitions
+(Lisp-like programming languages would have called them \verb'let' and not \verb'let*').
+Both the type declarations and the definitions are given in {\tt []}es. Thus, the expression \ref{eq:parallel-let-example} can be written in the TFX syntax as follows.
 \begin{verbatim}
-    tff(a_type,type,a: $int).
-    tff(b_type,type,b: $int).
-    tff(p_type,type,p: ($int * $int) > $o).
-    tff(let_tuple_1,axiom,$let([a: $int,b: $int],[a:= b,b:= a],p(a,b)) ).
+tff(a,type,a: $i).
+tff(b,type,b: $i).
+tff(p,type,p: ($i * $i) > $o).
+tff(pba,axiom,
+    $let([a: $i,b: $i],
+         [a:= b, b:= a],
+         p(a,b))).
 \end{verbatim}
-\ldots~is equivalent to~\ldots
+% For example~\ldots
+% \begin{verbatim}
+% tff(a_type,type,a: $int).
+% tff(b_type,type,b: $int).
+% tff(p_type,type,p: ($int * $int) > $o).
+% tff(let_tuple_1,axiom,$let([a: $int,b: $int],[a:= b,b:= a],p(a,b)) ).
+% \end{verbatim}
+% \ldots~is equivalent to~\ldots
+% \begin{verbatim}
+% tff(a_type,type,a: $int).
+% tff(b_type,type,b: $int).
+% tff(p_type,type,p: ($int * $int) > $o).
+% tff(let_tuple_1,axiom,p(b,a)).
+% \end{verbatim}
+
+Function symbols, predicate symbols, and tuples can all be defined simultaneously. In the following example two function symbols are defined simultaneously.
 \begin{verbatim}
-    tff(a_type,type,a: $int).
-    tff(b_type,type,b: $int).
-    tff(p_type,type,p: ($int * $int) > $o).
-    tff(let_tuple_1,axiom,p(b,a)).
+tff(i_type,type,i: $int).
+tff(f_type,type,f: ($int * $int * $int * $int) > $int).
+tff(p_type,type,p: $int > $o ).
+tff(let_tuple_2,axiom,
+    $let([ff: ($int * $int) > $int, gg: $int > $int],
+         [ff(X,Y):= f(X,X,Y,Y), gg(Z):= f(Z,Z,Z,Z)],
+         p(ff(i,gg(i)))) ).
 \end{verbatim}
-\ldots~and~\ldots
+% \ldots~is equivalent to~\ldots
+% \begin{verbatim}
+% tff(i_type,type,i: $int).
+% tff(f_type,type,f: ($int * $int * $int * $int) > $int).
+% tff(p_type,type,p: $int > $o ).
+% tff(let_tuple_2,axiom,p(f(i,i,f(i,i,i,i),f(i,i,i,i))) ).
+% \end{verbatim}
+
+% As tuples cannot be typed~\ldots
+% \begin{verbatim}
+% tff(p_type,type,p: ($int * $int) > $o).
+% tff(not_let_tuple,axiom,
+%     $let([a: $int,b: $int],[a:= b,b:= a],p(a,b)) ).
+% \end{verbatim}
+% \ldots~cannot be abbreviated to~\ldots
+% \begin{verbatim}
+% tff(p_type,type,p: ($int * $int) > $o).
+% tff(not_let_tuple,axiom,
+%     $let([a,b]: [$int,$int],[a:= b,b:= a],p(a,b)) ).
+% \end{verbatim}
+
+Sequential let expressions (\verb'let*') can be implemented by nesting. In the following example {\tt ff} and {\tt gg} are defined in sequence.
 \begin{verbatim}
-    tff(i_type,type,i: $int).
-    tff(f_type,type,f: ($int * $int * $int * $int) > $int).
-    tff(p_type,type,p: $int > $o ).
-    tff(let_tuple_2,axiom,
-        $let([ff: ($int * $int) > $int, gg: $int > $int],
-             [ff(X,Y):= f(X,X,Y,Y), gg(Z):= f(Z,Z,Z,Z)],
-             p(ff(i,gg(i)))) ).
+tff(i_type,type,i: $int).
+tff(f_type,type,f: ($int * $int * $int * $int) > $int).
+tff(p_type,type,p: $int > $o ).
+tff(let_tuple_3,axiom,
+    $let(ff: ($int * $int) > $int,
+         ff(X,Y):= f(X,X,Y,Y),
+         $let(gg: $int > $int,gg(Z):= ff(Z,Z),p(gg(i)) ) ) ).
 \end{verbatim}
-\ldots~is equivalent to~\ldots
+% \ldots~is equivalent to~\ldots
+% \begin{verbatim}
+% tff(i_type,type,i: $int).
+% tff(f_type,type,f: ($int * $int * $int * $int) > $int).
+% tff(p_type,type,p: $int > $o ).
+% tff(let_tuple_3,axiom,p(f(i,i,i,i)) ).
+% \end{verbatim}
+
+% Tuples can be used directly in let expressions. 
+% For example~\ldots
+% \begin{verbatim}
+% tff(p_type,type,p: ($int * $int) > $o ).
+% tff(q_type,type,q: [$int,$int] > $o ).
+% tff(let_tuple_4,axiom,$let([a:$int,b:$int], [a,b]:= [27,28], p(a,b)) ).
+% tff(let_tuple_5,axiom,$let(d: [$int,$int], d:= [27,28],q(d)) ).
+% \end{verbatim}
+% \ldots~is equivalent to~\ldots
+% \begin{verbatim}
+% tff(p_type,type,p: ($int * $int) > $o ).
+% tff(q_type,type,q: [$int,$int] > $o ).
+% tff(let_tuple_4,axiom,p(27,28)) ).
+% tff(let_tuple_5,axiom,q([27,28])) ).
+% \end{verbatim}
+
+Let expression can use definitions of tuples.
+Formula~\ref{eq:fool-tuple-let} can be written in the TFX syntax as follows.
 \begin{verbatim}
-    tff(i_type,type,i: $int).
-    tff(f_type,type,f: ($int * $int * $int * $int) > $int).
-    tff(p_type,type,p: $int > $o ).
-    tff(let_tuple_2,axiom,p(f(i,i,f(i,i,i,i),f(i,i,i,i))) ).
+tff(plus,type,plus: ([$real,$real] * [$real,$real]) > [$real,$real]).
+tff(plus_def,axiom,
+    ! [X: [$real,$real],Y: [$real$,$real]] :
+      plus(X,Y) = $let([[a,b]: [$real,$real],[c,d]: [$real,$real]],
+                       [[a,b]:= X, [c,d]:= Y],
+                       [$sum(a,c),$sum(b,d)]) ).
 \end{verbatim}
-As tuples cannot be typed~\ldots
-\begin{verbatim}
-    tff(p_type,type,p: ($int * $int) > $o).
-    tff(not_let_tuple,axiom,
-        $let([a: $int,b: $int],[a:= b,b:= a],p(a,b)) ).
-\end{verbatim}
-\ldots~cannot be abbreviated to~\ldots
-\begin{verbatim}
-    tff(p_type,type,p: ($int * $int) > $o).
-    tff(not_let_tuple,axiom,
-        $let([a,b]: [$int,$int],[a:= b,b:= a],p(a,b)) ).
-\end{verbatim}
-Sequential let expressions (let*) can be implemented by nesting. 
-For example~\ldots
-\begin{verbatim}
-    tff(i_type,type,i: $int).
-    tff(f_type,type,f: ($int * $int * $int * $int) > $int).
-    tff(p_type,type,p: $int > $o ).
-    tff(let_tuple_3,axiom,
-        $let(ff: ($int * $int) > $int,
-             ff(X,Y):= f(X,X,Y,Y),
-             $let(gg: $int > $int,gg(Z):= ff(Z,Z),p(gg(i)) ) ) ).
-\end{verbatim}
-\ldots~is equivalent to~\ldots
-\begin{verbatim}
-    tff(i_type,type,i: $int).
-    tff(f_type,type,f: ($int * $int * $int * $int) > $int).
-    tff(p_type,type,p: $int > $o ).
-    tff(let_tuple_3,axiom,p(f(i,i,i,i)) ).
-\end{verbatim}
-Tuples can be used directly in let expressions. 
-For example~\ldots
-\begin{verbatim}
-    tff(p_type,type,p: ($int * $int) > $o ).
-    tff(q_type,type,q: [$int,$int] > $o ).
-    tff(let_tuple_4,axiom,$let([a:$int,b:$int], [a,b]:= [27,28], p(a,b)) ).
-    tff(let_tuple_5,axiom,$let(d: [$int,$int], d:= [27,28],q(d)) ).
-\end{verbatim}
-\ldots~is equivalent to~\ldots
-\begin{verbatim}
-    tff(p_type,type,p: ($int * $int) > $o ).
-    tff(q_type,type,q: [$int,$int] > $o ).
-    tff(let_tuple_4,axiom,p(27,28)) ).
-    tff(let_tuple_5,axiom,q([27,28])) ).
-\end{verbatim}
+
 %------------------------------------------------------------------------------
 \section{Software Support and Examples}
 \label{ImplementationExamples}
@@ -1072,31 +1108,42 @@ FOOL, namely conditional expressions, let expressions, and tuples.
 \subsection{Examples}
 \label{Examples}
 
-Figure~\ref{ImplicationFunction} shows an example that uses formulae as
-terms, quantifies over boolean variables, and uses boolean equality as 
-equivalence.
-
-\begin{figure}[htbp]
-\begin{small}
+Tuples can be used usefully in conditional expressions. For example~\ldots
 \begin{verbatim}
-%------------------------------------------------------------------------------
-tff(imply,type, imply: ( $o * $o ) > $o ).
-tff(graph,type, p: ( $i * $i ) > $o ).
-
-tff(imply_definition,axiom,
-    ! [X:$o,Y:$o] : ( imply(X,Y) = ( ~ X | Y) ) ).
-
-tff(graph_impl,axiom,
-    ! [X: $i,Y: $i] : ( p(X,Y) => f(X) = Y ) ).
-
-tff(graph_conjecture,conjecture,(
-    ! [X: $i,Y: $i,Z: $i] : imply(p(X,Y) & p(X,Z),Y = Z) )).
-%------------------------------------------------------------------------------
+tff(p_type,type,p: [$int,$int] > $o).
+tff(d_type,type,d: [$int,$int]).
+tff(ite_3,axiom,
+    ! [X:$int,Y:$int] : p($ite($greater(X,Y),[X,Y],[Y,X])) ).
+tff(ite_4,axiom,
+    ! [X:$int,Y:$int] : d = $ite($greater(X,Y),[X,Y],[Y,X]) ).
 \end{verbatim}
-\end{small}
-\caption{Implication is a function}
-\label{ImplicationFunction}
-\end{figure}
+
+% EK: this example is used earlier in the TFX syntax section
+% Figure~\ref{ImplicationFunction} shows an example that uses formulae as
+% terms, quantifies over boolean variables, and uses boolean equality as 
+% equivalence.
+
+% \begin{figure}[htbp]
+% \begin{small}
+% \begin{verbatim}
+% %------------------------------------------------------------------------------
+% tff(imply,type, imply: ( $o * $o ) > $o ).
+% tff(graph,type, p: ( $i * $i ) > $o ).
+
+% tff(imply_definition,axiom,
+% ! [X:$o,Y:$o] : ( imply(X,Y) = ( ~ X | Y) ) ).
+
+% tff(graph_impl,axiom,
+% ! [X: $i,Y: $i] : ( p(X,Y) => f(X) = Y ) ).
+
+% tff(graph_conjecture,conjecture,(
+% ! [X: $i,Y: $i,Z: $i] : imply(p(X,Y) & p(X,Z),Y = Z) )).
+% %------------------------------------------------------------------------------
+% \end{verbatim}
+% \end{small}
+% \caption{Implication is a function}
+% \label{ImplicationFunction}
+% \end{figure}
 
 Figure~\ref{TupleConditionalLet} shows how tuples, conditional expressions, 
 and let expressions can be mixed in useful ways, here to place two integer
@@ -1144,15 +1191,15 @@ tff(x_leq_y,conjecture,
 %------------------------------------------------------------------------------
 \end{verbatim}
 \end{small}
-\caption{A TFX encoding of a program analysis problem on Figure
-\ref{fig:simple-if}.}
+\caption{A TFX encoding of the program analysis problem in
+Figure~\ref{fig:simple-if}.}
 \label{LetITE}
 \end{figure}
 
 Figure~\ref{Truthteller} shows an example that uses formulae as terms, in
 the second arguments of the {\tt says} predicate.
-The problem is to find a model, from the it is possible to determine which
-of {\tt A},{\tt B}, or {\tt C} is the only truthteller on this
+The problem is to find a model, from which it is possible to determine which
+of {\tt a}, {\tt b}, or {\tt c} is the only truthteller on this
 Smullyanesque island \cite{Smu78}.
 
 \begin{figure}[htbp]
