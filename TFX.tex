@@ -561,15 +561,14 @@ in FOOL.
 The existence of $\bool$ terms means that a function or a predicate can take 
 a formula as an argument, and formulae can be used as arguments to equality.
 For example, logical implication can be defined as a binary function
-$\mathit{impl}$ of the type $\bool \times \bool \to \bool$ using the following
-axiom.
+$\mathit{impl}$ of the type $\bool \times \bool \to \bool$ using this axiom:
 \begin{equation}\label{eq:fool-impl}
 (\forall x:\bool)(\forall y:\bool)(\mathit{impl}(x,y) \liff \neg x \lor y).
 \end{equation}
 Formula \ref{eq:fool-impl} can be equivalently expressed with $=$ instead of
 $\liff$.
 Then it is possible to express that $P$ is a graph of a (partial) function of 
-the type $\sigma \to \tau$ as follows.
+the type $\sigma \to \tau$ as:
 \begin{equation}\label{eq:bool-arg-example}
 (\forall x:\sigma)(\forall y:\tau)(\forall z:\tau)
 \mathit{impl}(P(x,y) \land P(x,z), y = z)
@@ -602,14 +601,14 @@ expressing formulae coming from program analysis.
 For example, consider the $\mathit{max}$ function of the type 
 $\mathds{Z}\times\mathds{Z}\to\mathds{Z}$ that returns the maximum of its 
 arguments. 
-Its definition can be expressed in FOOL as
+Its definition can be expressed in FOOL as:
 \begin{equation}\label{eq:ite-t-example}
 (\forall x:\mathds{Z})(\forall y:\mathds{Z})
 (\mathit{max}(x, y) = \ite{x \geq y}{x}{y}).
 \end{equation}
 
 FOOL allows if-then-else expressions to occur as formulae, as in the
-following valid property of $\mathit{max}$
+following valid property of $\mathit{max}$:
 \begin{equation}\label{eq:ite-f-example}
 (\forall x:\mathds{Z})(\forall y:\mathds{Z})
 (\ite{\mathit{max}(x, y) = x}{x \geq y}{y \geq x}).
@@ -627,7 +626,7 @@ $\binding{f(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{s}$, where
 $n \geq 0$, and $s$ is a term of the type $\tau$.
 The following let expression denotes the maximum of three integer constants
 $a$, $b$, and $c$ using a local definition of the function symbol
-$\mathit{max}$.
+$\mathit{max}$:
 \begin{equation}\label{eq:fool-let-impl}
 \begin{aligned}
 \mathtt{let}\;&\binding{\mathit{max}(x:\mathds{Z},y:\mathds{Z})}
@@ -640,7 +639,7 @@ The definition of a predicate symbol $p:\sigma_1\times\ldots\times\sigma_n$ has
 the form $\binding{p(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{\phi}$, where 
 $n \geq 0$, and $\phi$ is a formula.
 The following let expression denotes equivalence of two boolean constants 
-$A$ and $B$ using a local definition of the predicate symbol $\mathit{impl}$.
+$A$ and $B$ using a local definition of the predicate symbol $\mathit{impl}$:
 \begin{equation}\label{eq:fool-let-impl2}
 \begin{aligned}
 \mathtt{let}\;&\binding{\mathit{impl}(x:\bool,y:\bool)}{\neg x \lor y}\\
@@ -651,8 +650,9 @@ $A$ and $B$ using a local definition of the predicate symbol $\mathit{impl}$.
 The definition of a tuple has the form $\binding{(c_1,\ldots,c_n)}{s}$, where
 $n > 1$, $c_1,\ldots,c_n$ are constant symbols of the types
 $\sigma_1,\ldots,\sigma_n$, respectively, and $s$ is a term of the type
-$(\sigma_1,\ldots,\sigma_n)$. The following formula defines addition for
-complex numbers using two simultaneous local definition of tuples.
+$(\sigma_1,\ldots,\sigma_n)$. 
+The following formula defines addition for complex numbers using two 
+simultaneous local definition of tuples:
 \begin{equation}\label{eq:fool-tuple-let}
   \begin{aligned}
   &(\forall x:(\mathds{R},\mathds{R}))(\forall y:(\mathds{R},\mathds{R}))\\
@@ -738,22 +738,22 @@ The BNF excerpt is~\ldots
 <tfx_unitary_formula>  ::= <variable>
 \end{verbatim}
 
-For example, Formula~\ref{eq:fool-bool-var} can be written in the TFX syntax as
-follows.
+For example, Formula~\ref{eq:fool-bool-var} can be written in TFX syntax:
 \begin{verbatim}
 tff(tautology,conjecture,! [X: $o]: (X | ~X) ).
 \end{verbatim}
 
-The type of the $\mathit{impl}$ predicate can be written in the TFX syntax as
-\verb'($o * $o) > $o' and its definition in Formula~\ref{eq:fool-impl} can be
-written as follows.
+The type of the $\mathit{impl}$ predicate in Formula~\ref{eq:fool-impl} can 
+be written in the TFX syntax as \verb'($o * $o) > $o', and its definition 
+as:
 \begin{verbatim}
 tff(impl_type,type,impl: ($o * $o) > $o ).
 tff(impl_defn,axiom, ! [X: $o,Y: $o]: (impl(X,Y) <=> (~X | Y)) ).
 \end{verbatim}
 
-Notice that the negation of a boolean variable used as a formula must be
-placed inside parenthesis.
+% No longer necessary
+% Notice that the negation of a boolean variable used as a formula must be
+% placed inside parenthesis.
 
 %------------------------------------------------------------------------------
 \subsection{Formulae as boolean terms}
@@ -768,7 +768,7 @@ The BNF excerpt is~\ldots
                            <tfx_tuple> | <variable> | (<tff_logic_formula>)
 \end{verbatim}
 
-Formula~\ref{eq:bool-arg-example} can be written in TFX as follows.
+Formula~\ref{eq:bool-arg-example} can be written in TFX as:
 \begin{verbatim}
 tff(s,type,s: $tType).
 tff(t,type,t: $tType).
@@ -819,7 +819,8 @@ The BNF excerpt is~\ldots
 \end{verbatim}
 
 The tuple type $\tuple{\mathds{R},\mathds{R}}$ can be written in the TFX syntax as \verb|[$real,$real]| and the type of the addition function for complex numbers $\tuple{\mathds{R},\mathds{R}} \times \tuple{\mathds{R},\mathds{R}} \to \tuple{\mathds{R},\mathds{R}}$ can be written as
-\verb'([$real,$real] * [$real,$real]) > [$real,$real]'. The tuple term $\tuple{2,3}$ can be written as \verb'[2,3]'.
+\verb'([$real,$real] * [$real,$real]) > [$real,$real]'. 
+The tuple term $\tuple{2,3}$ can be written as \verb'[2,3]'.
 
 % For example~\ldots
 % \begin{verbatim}
@@ -831,7 +832,7 @@ The tuple type $\tuple{\mathds{R},\mathds{R}}$ can be written in the TFX syntax 
 % \end{verbatim}
 Tuples can occur only as terms (not as formulae, and not on the lefthand side 
 of a type declaration), anywhere they are well-typed. 
-For example~\ldots
+For example:
 \begin{verbatim}
 tff(p_type,type,p: ([$int,$i,$o] * $o * $int) > $o ).
 tff(q_type,type,q: ($int * $i) > $o ).
@@ -840,7 +841,7 @@ tff(tuples_1,axiom,! [X: $int] : p([33,me,$true],! [Y: $i] : q(X,Y),27) ).
 \end{verbatim}
 
 Tuples cannot be typed. Rather the elements must be typed separately. 
-For example~\ldots
+For example:
 \begin{verbatim}
 tff(a_type,type,a: $int).
 tff(b_type,type,b: $int).
@@ -861,7 +862,7 @@ third arguments. The type of the conditional expression is the type of its secon
 \end{verbatim}
 
 Formulae~\ref{eq:ite-t-example} and \ref{eq:ite-f-example} can be expressed in
-TFX as follows.
+TFX as:
 \begin{verbatim}
 tff(max_type,type,max: ($int * $int) > $int).
 tff(max_defn,axiom,
@@ -1073,7 +1074,7 @@ tff(let_tuple_3,axiom,
 % \end{verbatim}
 
 Let expression can use definitions of tuples.
-Formula~\ref{eq:fool-tuple-let} can be written in the TFX syntax as follows.
+Formula~\ref{eq:fool-tuple-let} can be written in TFX syntax as:
 \begin{verbatim}
 tff(plus,type,plus: ([$real,$real] * [$real,$real]) > [$real,$real]).
 tff(plus_def,axiom,
