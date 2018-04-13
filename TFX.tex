@@ -706,9 +706,14 @@ simultaneous non-recursive local definitions in programming languages. That is,
 neither of the definitions $D_1,\ldots,\allowbreak D_n$ uses function or
 predicate symbols created by any other definition. In the following example,
 constants $a$ and $b$ are swapped by a let expression. The resulting formula
-is equivalent to $f(b, a)$.
+is equivalent to $P(b, a)$.
 \begin{equation}\label{eq:parallel-let-example}
-\mathtt{let}\;\binding{a}{b}\,;\,\binding{b}{a}\;\mathtt{in}\;f(a, b)
+\mathtt{let}\;\binding{a}{b}\,;\,\binding{b}{a}\;\mathtt{in}\;P(a, b)
+\end{equation}
+
+Formula~\ref{eq:parallel-let-example} can be equivalently expressed using a let expression with a definition of a tuple as follows.
+\begin{equation}\label{eq:parallel-let-tuple-example}
+\mathtt{let}\;\binding{(a,b)}{(b,a)}\;\mathtt{in}\;P(a, b)
 \end{equation}
 
 %------------------------------------------------------------------------------
@@ -731,7 +736,7 @@ with examples and commentary.
 \subsection{Boolean variables as formulae}
 
 Variables of type {\tt \$o} can be used as formulae. 
-The BNF excerpt is~\ldots
+The following is the relevant BNF excerpt.
 \begin{verbatim}
 <tff_unitary_formula>  ::= <tff_quantified_formula> | <tff_atomic_formula> |
                            <tfx_unitary_formula> | (<tff_logic_formula>)
@@ -759,7 +764,7 @@ tff(impl_defn,axiom, ! [X: $o,Y: $o]: (impl(X,Y) <=> (~X | Y)) ).
 \subsection{Formulae as boolean terms}
 
 Formulae can be used as boolean terms. 
-The BNF excerpt is~\ldots
+The following is the relevant BNF excerpt.
 \begin{verbatim}
 <tff_logic_formula>    ::= <tff_unitary_formula> | <tff_unary_formula> |
                            <tff_binary_formula> | <tff_defined_infix>
@@ -808,7 +813,7 @@ non-boolean terms -- tuples of formulae have been removed from TFF.
 Tuples in TFX are written in {\tt []} brackets, and can contain any type of 
 term (including formulae and variables of type {\tt \$o}). 
 Signatures can contain tuple types. 
-The BNF excerpt is~\ldots
+The following is the relevant BNF excerpt.
 \begin{verbatim}
 <tfx_tuple_type>       ::= [<tff_type_list>]
 <tff_type_list>        ::= <tff_top_level_type> |
@@ -856,7 +861,7 @@ tff(ab_type,type,[a,b]: [$int,$int]).
 
 Conditional expressions are parametric polymorphic, taking a formula as the 
 first argument, then two formulae or terms of the same type as the second and 
-third arguments. The type of the conditional expression is the type of its second and third arguments. The BNF excerpt is~\ldots
+third arguments. The type of the conditional expression is the type of its second and third arguments. The following is the relevant BNF excerpt.
 \begin{verbatim}
 <tfx_conditional>      ::= $ite(<tff_logic_formula>,<tff_term>,<tff_term>)
 \end{verbatim}
@@ -879,12 +884,7 @@ that contained two separate keywords \verb'$ite_t' and \verb'$ite_f'.
 %------------------------------------------------------------------------------
 \subsection{Let expressions}
 
-Let expressions provide the types of defined symbols, definitions for the 
-symbols, and a formula/term in which the definitions are applied. 
-Each type declaration is the same as a type declaration in an annotated 
-formula with the type role.
-Each definition defines the expansion of one of the declared symbols.
-The BNF excerpt is~\ldots
+Each let expression in TFX consists of (i) the type signatures of the defined symbols; (ii) the definitions of the symbols; and (iii) the formula or term in which the definitions are applied. Type signatures in let expressions syntactically match those in annotated formulas with the \verb'type' role. Definitions of symbols include one or more function symbol, predicate symbol, or tuple, defined simultaneously. The type signature must include all function symbols, predicate symbols, and elements of tuples, used in the definitions. The following is the relevant BNF excerpt.
 \begin{verbatim}
 <tfx_let>              ::= $let(<tfx_let_types>,<tfx_let_defns>,<tff_term>)
 <tfx_let_types>        ::= <tff_atom_typing> | [<tff_atom_typing_list>]
@@ -980,6 +980,17 @@ symbol.
 The occurrence in the righthand side of the definition 
 {\tt \$ite(I = 3,5,array(I))} is the globally defined symbol.
 
+Let expression can use definitions of tuples. Formula~\ref{eq:parallel-let-tuple-example} can be written in TFX syntax as following.
+\begin{verbatim}
+tff(a,type,a: $i).
+tff(b,type,b: $i).
+tff(p,type,p: ($i * $i) > $o).
+tff(pba,axiom,
+    $let([a: $i,b: $i],
+         [a,b]:= [b,a],
+         p(a,b))).
+\end{verbatim}
+
 Let expressions can use simultaneous local definitions
 (Lisp-like programming languages would have called them \verb'let' and not \verb'let*').
 Both the type declarations and the definitions are given in {\tt []}es. 
@@ -1073,8 +1084,7 @@ tff(let_tuple_3,axiom,
 % tff(let_tuple_5,axiom,q([27,28])) ).
 % \end{verbatim}
 
-Let expression can use definitions of tuples.
-Formula~\ref{eq:fool-tuple-let} can be written in TFX syntax as:
+Formula~\ref{eq:fool-tuple-let} can be written in TFX as follows. Notice that the type declaration contains the elements of both tuples in the simultaneous definition.
 \begin{verbatim}
 tff(plus,type,plus: ([$real,$real] * [$real,$real]) > [$real,$real]).
 tff(plus_def,axiom,
