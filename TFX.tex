@@ -55,8 +55,8 @@ TF0 and TF1 together form the TFF language family; TH0 and TH1 together form
 the THF language family. 
 Since the inception of TFF there have been some features that have received 
 little use, and hence little attention, such as tuples, conditional 
-expressions (if-then-else), and let expressions. 
-This paper introduces the Typed First-order eXtended form (TFX), which extends
+expressions, and let expressions. 
+This paper introduces the eXtended Typed First-order form (TFX), which extends
 TFF to include these and other features. 
 \end{abstract}
 
@@ -86,7 +86,7 @@ The TPTP world includes the TPTP problem library,
 % \cite{Sut09}, 
 the TSTP solution library,
 % \cite{Sut10}, 
-the TMTP model library,
+% the TMTP model library,
 % \cite{SS16},
 standards for writing ATP problems and reporting ATP solutions,
 % \cite{SS+06,Sut08-KEAPPA}, 
@@ -116,7 +116,7 @@ Since the inception of TFF there have been some features that have
 received little use, and hence little attention. 
 In particular, tuples, conditional expressions (if-then-else), and let 
 expressions (let-defn-in) were neglected, and the latter two were horribly 
-formulated with variants to distinguish between their use with formulae and 
+formulated with variants to distinguish between their use as formulae and 
 terms. 
 Recently, conditional expressions and let expressions have become more 
 important because of their use in software verification applications.
@@ -128,20 +128,20 @@ variables to be used as formulae, (iii)~contains conditional expressions, and
 (iv)~contains let expressions with definitions of function symbols, predicate
 symbols, and tuples. 
 FOOL can be extended with the theory of tuples~\cite{KKV18}
-that contains first class tuple terms and first class tuple types. 
+that defines first class tuple terms and first class tuple types. 
 Features of FOOL can be used to concisely express problems coming from program
 analysis~\cite{KKV18} or translated from more expressive logics. 
-Conditional expressions and let expressions of FOOL resemble those of the 
+The conditional expressions and let expressions of FOOL resemble those of the 
 SMT-LIB language version 2~\cite{BST10}.
 
-The TPTP's new Typed First-order form eXtended (TFX) language remedies the
+The TPTP's new eXtended Typed First-order form (TFX) language remedies the
 old weaknesses of TFF, and incorporates the features of FOOL.
 This has been achieved by conflating (with some exceptions) formulae and 
 terms, simplifying tuples in plain TFF, including fully expressive tuples in 
 TFX, removing the old conditional expressions and let expressions from 
 TFF, and including new elegant forms of conditional expressions and let 
 expressions as part of TFX. 
-(These more elegant forms have been mirrored in THF, but this is not a topic of
+(These more elegant forms have been mirrored in THF, but that is not a topic of
 this paper.)
 TFX is a superset of the TFF language. 
 This paper describes the extensions to the TFF language form that define the 
@@ -240,9 +240,9 @@ TF0 type signatures $\varsigma$ have the following forms:
 The type signatures of uninterpreted symbols are declared like types, in
 annotated formulae with a {\tt type} role -- see Figure~\ref{TF0Example}
 for examples.
-The type of {\tt =} is ad hoc polymorphic over all types except {\tt \$o} (this
-restriction is lifted in TFX), with both arguments having the same type and 
-the result type being {\tt \$o}.
+The type of {\tt =} and {\tt !=} is ad hoc polymorphic over all types 
+except {\tt \$o} (this restriction is lifted in TFX), with both arguments 
+having the same type and the result type being {\tt \$o}.
 The types of arithmetic predicates and functions are ad hoc polymorphic
 over the arithmetic types; see \cite{SS+12} for details.
 Figure~\ref{TF0Example} illustrates some TF0 formulae, whose conjecture can
@@ -320,9 +320,10 @@ TF1 type signatures $\varsigma$ have the following forms:
 \end{itemize}
 The {\tt !>} binder in the last form denotes universal quantification in the
 style of $\lambda\Pi$ calculi.
-It is only used at the top level in polymorphic type signatures.
-All type variables must be of type {\tt \$tType}; more complex type variables,
-e.g., {\tt \$tType$\;$>$\;$\$tType} are beyond rank-1 polymorphism.
+It is used only at the top level in polymorphic type signatures.
+All type variables must be of type {\tt \$tType}; more complex type variables
+% e.g., {\tt \$tType$\;$>$\;$\$tType} 
+are beyond rank-1 polymorphism.
 % In the example of Figure~\ref{TF1Example}, the type signature for 
 % {\tt mixture} is polymorphic.
 As in TF0, arithmetic symbols and equality are ad hoc polymorphic.
@@ -532,25 +533,25 @@ An example of TF1 formulae can be found in \cite{KSR16}.
 \label{FOOL}
 
 FOOL \cite{KKV15}, standing for First-Order Logic (FOL) + bOoleans, is a 
-variation of many-sorted first-order logic. FOOL extends the ordinary FOL in
-that it (i)~contains an interpreted boolean sort and allows formulae to be used
-as boolean terms, (ii)~allows boolean variables to be used as formulae,
-(iii)~contains conditional expressions, and (iv)~contains let expressions with
-definitions of function symbols, predicate symbols, and tuples. 
-FOOL can be straightforwardly extended with the polymorphic theory of 
-tuples \cite{KKV18}, and in what follows we consider that extension. 
-This theory includes first class tuples type and first class tuple terms. 
-First class tuple terms and tuple types are part of TFX as well. 
+variation of many-sorted first-order logic. 
+FOOL extends ordinary FOL in that it (i)~contains an interpreted boolean sort 
+and allows formulae to be used as boolean terms, (ii)~allows boolean variables 
+to be used as formulae, (iii)~contains conditional expressions, and 
+(iv)~contains let expressions with definitions of function symbols, predicate 
+symbols, and tuples. 
+FOOL can be straightforwardly extended with the polymorphic theory of tuples 
+that defines first class tuples type and first class tuple terms \cite{KKV18}.
+In what follows we consider that extension, and first class tuple terms and 
+tuple types are part of TFX.
 There is a model-preserving transformation of FOOL formulae to FOL formulae
 \cite{KKV15}, so that an implementation of the transformation makes it 
-possible to reason about FOOL formulae using a regular first-order theorem 
-prover. 
+possible to reason in FOOL using a regular first-order theorem prover. 
 Formulae of FOOL can also be efficiently translated to a first-order clausal 
 normal form~\cite{KK+16-GCAI}. 
 The following describes these features of FOOL, illustrating them using 
 examples taken from \cite{KK+16} and \cite{KKV18}.
 
-\subsubsection*{Boolean terms}
+\subsubsection{Boolean variables as formulae}
 FOOL contains a fixed two-element type $\bool$, allows quantification over 
 variables of the type $\bool$, and considers terms of the type $\bool$ to be
 formulae. Formula~\ref{eq:fool-bool-var} is a syntactically correct tautology
@@ -558,6 +559,8 @@ in FOOL.
 \begin{equation}\label{eq:fool-bool-var}
 (\forall x:\bool)(x \lor \neg x)
 \end{equation}
+
+\subsubsection{Formulae as boolean terms}
 The existence of $\bool$ terms means that a function or a predicate can take 
 a formula as an argument, and formulae can be used as arguments to equality.
 For example, logical implication can be defined as a binary function
@@ -565,16 +568,16 @@ $\mathit{impl}$ of the type $\bool \times \bool \to \bool$ using this axiom:
 \begin{equation}\label{eq:fool-impl}
 (\forall x:\bool)(\forall y:\bool)(\mathit{impl}(x,y) \liff \neg x \lor y).
 \end{equation}
-Formula \ref{eq:fool-impl} can be equivalently expressed with $=$ instead of
+Formula \ref{eq:fool-imply} can be equivalently expressed with $=$ instead of
 $\liff$.
 Then it is possible to express that $P$ is a graph of a (partial) function of 
 the type $\sigma \to \tau$ as:
 \begin{equation}\label{eq:bool-arg-example}
 (\forall x:\sigma)(\forall y:\tau)(\forall z:\tau)
-\mathit{impl}(P(x,y) \land P(x,z), y = z)
+\mathit{imply}(P(x,y) \land P(x,z), y = z)
 \end{equation}
 
-\subsubsection*{Tuples}
+\subsubsection{Tuples}
 FOOL extended with the theory of tuples contains a type
 $\tuple{\sigma_1,\ldots,\sigma_n}$ of the $n$-ary tuple for all types
 $\sigma_1,\ldots,\sigma_n$, $n>0$. Each type
@@ -592,7 +595,7 @@ A function symbol $\mathit{plus}$ that represents addition of complex numbers
 has the type $\tuple{\mathds{R},\mathds{R}} \times 
 \tuple{\mathds{R},\mathds{R}} \to \tuple{\mathds{R},\mathds{R}}$.
 
-\subsubsection*{Conditional expressions}
+\subsubsection{Conditional expressions}
 FOOL contains expressions of the form $\ite{\psi}{s}{t}$, where $\psi$ is a
 formula, and $s$ and $t$ are terms of the same type. 
 The semantics of such expressions mirrors the semantics of conditional 
@@ -614,7 +617,7 @@ following valid property of $\mathit{max}$:
 (\ite{\mathit{max}(x, y) = x}{x \geq y}{y \geq x}).
 \end{equation}
 
-\subsubsection*{Let expressions}
+\subsubsection{Let expressions}
 FOOL contains expressions of the form $\letindef{D_1;\ldots;D_k}{t}$, where
 $k > 0$, $t$ is either a term or a formula, and $D_1,\ldots,D_k$ are
 simultaneous non-recursive definitions. FOOL allows definitions of function
@@ -627,7 +630,7 @@ $n \geq 0$, and $s$ is a term of the type $\tau$.
 The following let expression denotes the maximum of three integer constants
 $a$, $b$, and $c$ using a local definition of the function symbol
 $\mathit{max}$:
-\begin{equation}\label{eq:fool-let-impl}
+\begin{equation}\label{eq:fool-let-imply}
 \begin{aligned}
 \mathtt{let}\;&\binding{\mathit{max}(x:\mathds{Z},y:\mathds{Z})}
                        {\ite{x \geq y}{x}{y}}\\
@@ -639,11 +642,11 @@ The definition of a predicate symbol $p:\sigma_1\times\ldots\times\sigma_n$ has
 the form $\binding{p(x_1:\sigma_1,\ldots,x_n:\sigma_n)}{\phi}$, where 
 $n \geq 0$, and $\phi$ is a formula.
 The following let expression denotes equivalence of two boolean constants 
-$A$ and $B$ using a local definition of the predicate symbol $\mathit{impl}$:
-\begin{equation}\label{eq:fool-let-impl2}
+$A$ and $B$ using a local definition of the predicate symbol $\mathit{imply}$:
+\begin{equation}\label{eq:fool-let-imply2}
 \begin{aligned}
-\mathtt{let}\;&\binding{\mathit{impl}(x:\bool,y:\bool)}{\neg x \lor y}\\
- \mathtt{in}\;&\mathit{impl}(A,B)\wedge\mathit{impl}(B,A)
+\mathtt{let}\;&\binding{\mathit{imply}(x:\bool,y:\bool)}{\neg x \lor y}\\
+ \mathtt{in}\;&\mathit{imply}(A,B)\wedge\mathit{imply}(B,A)
 \end{aligned}
 \end{equation}
 
@@ -666,7 +669,7 @@ problems coming from program analysis, namely modelling of assignments
 The lefthand side of Figure~\ref{fig:simple-if} shows an example of an 
 imperative \texttt{if} statement containing assignments to integer variables, 
 and an \texttt{assert} statement. 
-This can be encoded as a FOOL formula as shown on the righthand side, using 
+This can be encoded in FOOL as shown on the righthand side, using 
 let expressions with definitions of tuples that capture the assignments.
 
 \begin{figure}[htbp]
@@ -720,13 +723,13 @@ Formula~\ref{eq:parallel-let-example} can be equivalently expressed using a let 
 \section{The TFX Syntax}
 \label{TFX}
 
-The TPTP syntax has been extended to provide the features of FOOL,
+The TPTP TFF syntax has been extended to provide the features of FOOL,
 and at the same time some of the previous weaknesses have been remedied.
-Formulae and term have been conflated (with some exceptions).
+Formulae and terms have been conflated (with some exceptions).
 Tuples have been simplified in TFF, and fully expressive tuples included in 
 TFX. 
-The old conditional expressions and let expressions from TFF have been 
-removed, and new elegant forms have been included as part of TFX. 
+The old conditional expressions and let expressions have been removed from 
+TFF, and new elegant forms have been included as part of TFX. 
 The grammar of THX is captured in version v7.1.0.2 of the TPTP syntax,
 available online at \url{http://www.tptp.org/TPTP/SyntaxBNF.html}.
 In the subsections below, the relevant excerpts of the BNF are provided,
@@ -748,12 +751,12 @@ For example, Formula~\ref{eq:fool-bool-var} can be written in TFX syntax:
 tff(tautology,conjecture,! [X: $o]: (X | ~X) ).
 \end{verbatim}
 
-The type of the $\mathit{impl}$ predicate in Formula~\ref{eq:fool-impl} can 
+The type of the $\mathit{imply}$ predicate in Formula~\ref{eq:fool-imply} can 
 be written in the TFX syntax as \verb'($o * $o) > $o', and its definition 
 as:
 \begin{verbatim}
-tff(impl_type,type,impl: ($o * $o) > $o ).
-tff(impl_defn,axiom, ! [X: $o,Y: $o]: (impl(X,Y) <=> (~X | Y)) ).
+tff(imply_type,type,imply: ($o * $o) > $o ).
+tff(imply_defn,axiom, ! [X: $o,Y: $o]: (imply(X,Y) <=> (~X | Y)) ).
 \end{verbatim}
 
 % No longer necessary
@@ -779,7 +782,7 @@ tff(s,type,s: $tType).
 tff(t,type,t: $tType).
 tff(p,type,p: (s * t) > $o ).
 tff(graph,axiom,
-    ! [X: s,Y: t,Z: s] : impl(p(X,Y) & p(X,Z), Y = Z) ).
+    ! [X: s,Y: t,Z: s] : imply(p(X,Y) & p(X,Z),Y = Z) ).
 \end{verbatim}
 % For example~\ldots
 % \begin{verbatim}
@@ -799,8 +802,7 @@ tff(graph,axiom,
 A consequence of allowing formulae as terms is that the default typing of 
 functions and predicates supported in plain TFF (functions default to 
 {\tt (\$i * \ldots * \$i) > \$i} and predicates default to 
-{\tt (\$i * \ldots * \$i) > \$o)} is not supported in TFX (as is the case 
-for THF).
+{\tt (\$i * \ldots * \$i) > \$o)} is not supported in TFX.
 
 Note that not all terms can be used as formulae.
 Tuples, numbers, and ``distinct objects'' cannot be used as formulae.
@@ -811,14 +813,13 @@ Tuples, numbers, and ``distinct objects'' cannot be used as formulae.
 Tuples in TFF are written in {\tt []} brackets, and can contain only
 non-boolean terms -- tuples of formulae have been removed from TFF. 
 Tuples in TFX are written in {\tt []} brackets, and can contain any type of 
-term (including formulae and variables of type {\tt \$o}). 
+term, including formulae and variables of type {\tt \$o}. 
 Signatures can contain tuple types. 
 The following is the relevant BNF excerpt.
 \begin{verbatim}
 <tfx_tuple_type>       ::= [<tff_type_list>]
 <tff_type_list>        ::= <tff_top_level_type> |
                            <tff_top_level_type>,<tff_type_list>
-
 <tfx_tuple>            ::= [] | [<tff_arguments>]
 <tff_arguments>        ::= <tff_term> | <tff_term>,<tff_arguments>
 \end{verbatim}
@@ -859,9 +860,12 @@ tff(ab_type,type,[a,b]: [$int,$int]).
 %------------------------------------------------------------------------------
 \subsection{Conditional expressions}
 
-Conditional expressions are parametric polymorphic, taking a formula as the 
-first argument, then two formulae or terms of the same type as the second and 
-third arguments. The type of the conditional expression is the type of its second and third arguments. The following is the relevant BNF excerpt.
+Conditional expressions are polymorphic, taking a formula as the first 
+argument, then two formulae or terms of the same type as the second and 
+third arguments. 
+The type of the conditional expression is the type of its second and third 
+arguments. 
+The following is the relevant BNF excerpt.
 \begin{verbatim}
 <tfx_conditional>      ::= $ite(<tff_logic_formula>,<tff_term>,<tff_term>)
 \end{verbatim}
@@ -884,7 +888,16 @@ that contained two separate keywords \verb'$ite_t' and \verb'$ite_f'.
 %------------------------------------------------------------------------------
 \subsection{Let expressions}
 
-Each let expression in TFX consists of (i) the type signatures of the defined symbols; (ii) the definitions of the symbols; and (iii) the formula or term in which the definitions are applied. Type signatures in let expressions syntactically match those in annotated formulas with the \verb'type' role. Definitions of symbols include one or more function symbol, predicate symbol, or tuple, defined simultaneously. The type signature must include all function symbols, predicate symbols, and elements of tuples, used in the definitions. The following is the relevant BNF excerpt.
+Each let expression in TFX consists of (i) the type signatures of the defined 
+symbols; (ii) the definitions of the symbols; and (iii) the formula or term 
+in which the definitions are applied. 
+Type signatures in let expressions syntactically match those in annotated 
+formulas with the \verb'type' role. 
+Definitions of symbols include one or more function symbols, predicate symbols,
+or tuples, defined simultaneously. 
+The type signature must include all function symbols, predicate symbols, and 
+elements of tuples, used in the definitions. 
+The following is the relevant BNF excerpt.
 \begin{verbatim}
 <tfx_let>              ::= $let(<tfx_let_types>,<tfx_let_defns>,<tff_term>)
 <tfx_let_types>        ::= <tff_atom_typing> | [<tff_atom_typing_list>]
@@ -912,7 +925,7 @@ supplied in the defined symbol's use.
 Such variables do not need to be declared (they are implicitly declared to be 
 of the type defined by the symbol declaration), but must be top-level arguments 
 of the defined symbol and be pairwise distinct. 
-Thus Formula~\ref{eq:fool-let-impl} can be written in TFX syntax as:
+Thus Formula~\ref{eq:fool-let-imply} can be written in TFX syntax as:
 \begin{verbatim}
 $let(max: ($real * $real) > $real,
      max(X,Y):= $ite($greatereq(X,Y),X,Y),
@@ -937,14 +950,14 @@ $let(max: ($real * $real) > $real,
 % tff(let_2,axiom,p(f(i,i,j,j)) ).
 % \end{verbatim}
 
-Similarly, Formula~\ref{eq:fool-let-impl2} can be written in TFX syntax as:
+Similarly, Formula~\ref{eq:fool-let-imply2} can be written in TFX syntax as:
 \begin{verbatim}
 tff(a,type,a: $o).
 tff(b,type,b: $o).
 tff(a_eq_b,axiom,
-    $let(impl: ($o * $o) > $o,
-         impl(X,Y):= ~X | Y,
-         impl(a,b) & impl(b,a)) ).
+    $let(imply: ($o * $o) > $o,
+         imply(X,Y):= ~X | Y,
+         imply(a,b) & imply(b,a)) ).
 \end{verbatim}
 
 The keyword \verb'$let' is used for let expressions defining both function and 
@@ -954,45 +967,45 @@ This is different from the old TFF syntax of let expressions that contained
 four separate keywords \verb'$let_tt', \verb'$let_tf', \verb'$let_ft', and 
 \verb'$let_ff'.
 
-The defined symbols have scope over the formula/term in which the definitions 
-are applied, shadowing any definition outside the let expression. 
-The RHS of a definition can have symbols with the same name as the defined 
-symbol, but refer to symbols defined outside the let expression. In the following example the local definition of the {\tt array} function symbols shadow the global declaration.
+Sequential let expressions (\verb'let*') can be implemented by nesting. 
+In the following example {\tt ff} and {\tt gg} are defined in sequence:
 \begin{verbatim}
-tff(array_type,type,array: $int > $real).
-tff(p_type,type,p: $real > $o).
-tff(let_3,axiom,
-    $let(array: $int > $real,
-         array(I):= $ite(I = 3,5.2,array(I)),
-         p($sum(array(2),array(3))) ) ).
+tff(i_type,type,i: $int).
+tff(f_type,type,f: ($int * $int * $int * $int) > $int).
+tff(p_type,type,p: $int > $o ).
+tff(let_tuple_3,axiom,
+    $let(ff: ($int * $int) > $int,
+         ff(X,Y):= f(X,X,Y,Y),
+         $let(gg: $int > $int,gg(Z):= ff(Z,Z),p(gg(i)) ) ) ).
+\end{verbatim}
+This is equivalent to:
+\begin{verbatim}
+tff(let_tuple_3,axiom,p(f(i,i,i,i)) ).
 \end{verbatim}
 % \ldots~is equivalent to~\ldots
+% tff(i_type,type,i: $int).
+% tff(f_type,type,f: ($int * $int * $int * $int) > $int).
+% tff(p_type,type,p: $int > $o ).
+
+% Tuples can be used directly in let expressions. 
+% For example~\ldots
 % \begin{verbatim}
-% tff(array_type,type,array: $int > $real).
-% tff(p_type,type,p: $real > $o).
-% tff(let_3,axiom,p($sum(array(2),5.2)) ).
+% tff(p_type,type,p: ($int * $int) > $o ).
+% tff(q_type,type,q: [$int,$int] > $o ).
+% tff(let_tuple_4,axiom,$let([a:$int,b:$int], [a,b]:= [27,28], p(a,b)) ).
+% tff(let_tuple_5,axiom,$let(d: [$int,$int], d:= [27,28],q(d)) ).
+% \end{verbatim}
+% \ldots~is equivalent to~\ldots
+% \begin{verbatim}
+% tff(p_type,type,p: ($int * $int) > $o ).
+% tff(q_type,type,q: [$int,$int] > $o ).
+% tff(let_tuple_4,axiom,p(27,28)) ).
+% tff(let_tuple_5,axiom,q([27,28])) ).
 % \end{verbatim}
 
-The occurrence of array in the lefthand side of the definition 
-{\tt array(I):=}, and the occurrences in the formula in which the let 
-expression is applied {\tt p(\$sum(array(2),array(3)))}, are the defined 
-symbol. 
-The occurrence in the righthand side of the definition 
-{\tt \$ite(I = 3,5,array(I))} is the globally defined symbol.
-
-Let expression can use definitions of tuples. Formula~\ref{eq:parallel-let-tuple-example} can be written in TFX syntax as following.
-\begin{verbatim}
-tff(a,type,a: $i).
-tff(b,type,b: $i).
-tff(p,type,p: ($i * $i) > $o).
-tff(pba,axiom,
-    $let([a: $i,b: $i],
-         [a,b]:= [b,a],
-         p(a,b))).
-\end{verbatim}
-
 Let expressions can use simultaneous local definitions
-(Lisp-like programming languages would have called them \verb'let' and not \verb'let*').
+(Lisp-like programming languages would have called them \verb'let' and 
+not \verb'let*').
 Both the type declarations and the definitions are given in {\tt []}es. 
 Thus Formula~\ref{eq:parallel-let-example} can be written in the TFX syntax as:
 \begin{verbatim}
@@ -1019,7 +1032,9 @@ tff(pba,axiom,
 % tff(let_tuple_1,axiom,p(b,a)).
 % \end{verbatim}
 
-Function symbols, predicate symbols, and tuples can all be defined simultaneously. In the following example two function symbols are defined simultaneously.
+% Function symbols, predicate symbols, and tuples can all be defined 
+% simultaneously. 
+In the following example two function symbols are defined simultaneously:
 \begin{verbatim}
 tff(i_type,type,i: $int).
 tff(f_type,type,f: ($int * $int * $int * $int) > $int).
@@ -1029,13 +1044,14 @@ tff(let_tuple_2,axiom,
          [ff(X,Y):= f(X,X,Y,Y), gg(Z):= f(Z,Z,Z,Z)],
          p(ff(i,gg(i)))) ).
 \end{verbatim}
+This is equivalent to:
 % \ldots~is equivalent to~\ldots
-% \begin{verbatim}
 % tff(i_type,type,i: $int).
 % tff(f_type,type,f: ($int * $int * $int * $int) > $int).
 % tff(p_type,type,p: $int > $o ).
-% tff(let_tuple_2,axiom,p(f(i,i,f(i,i,i,i),f(i,i,i,i))) ).
-% \end{verbatim}
+\begin{verbatim}
+tff(let_tuple_2,axiom,p(f(i,i,f(i,i,i,i),f(i,i,i,i))) ).
+\end{verbatim}
 
 % As tuples cannot be typed~\ldots
 % \begin{verbatim}
@@ -1050,41 +1066,10 @@ tff(let_tuple_2,axiom,
 %     $let([a,b]: [$int,$int],[a:= b,b:= a],p(a,b)) ).
 % \end{verbatim}
 
-Sequential let expressions (\verb'let*') can be implemented by nesting. In the following example {\tt ff} and {\tt gg} are defined in sequence.
-\begin{verbatim}
-tff(i_type,type,i: $int).
-tff(f_type,type,f: ($int * $int * $int * $int) > $int).
-tff(p_type,type,p: $int > $o ).
-tff(let_tuple_3,axiom,
-    $let(ff: ($int * $int) > $int,
-         ff(X,Y):= f(X,X,Y,Y),
-         $let(gg: $int > $int,gg(Z):= ff(Z,Z),p(gg(i)) ) ) ).
-\end{verbatim}
-% \ldots~is equivalent to~\ldots
-% \begin{verbatim}
-% tff(i_type,type,i: $int).
-% tff(f_type,type,f: ($int * $int * $int * $int) > $int).
-% tff(p_type,type,p: $int > $o ).
-% tff(let_tuple_3,axiom,p(f(i,i,i,i)) ).
-% \end{verbatim}
-
-% Tuples can be used directly in let expressions. 
-% For example~\ldots
-% \begin{verbatim}
-% tff(p_type,type,p: ($int * $int) > $o ).
-% tff(q_type,type,q: [$int,$int] > $o ).
-% tff(let_tuple_4,axiom,$let([a:$int,b:$int], [a,b]:= [27,28], p(a,b)) ).
-% tff(let_tuple_5,axiom,$let(d: [$int,$int], d:= [27,28],q(d)) ).
-% \end{verbatim}
-% \ldots~is equivalent to~\ldots
-% \begin{verbatim}
-% tff(p_type,type,p: ($int * $int) > $o ).
-% tff(q_type,type,q: [$int,$int] > $o ).
-% tff(let_tuple_4,axiom,p(27,28)) ).
-% tff(let_tuple_5,axiom,q([27,28])) ).
-% \end{verbatim}
-
-Formula~\ref{eq:fool-tuple-let} can be written in TFX as follows. Notice that the type declaration contains the elements of both tuples in the simultaneous definition.
+Let expression can use definitions of tuples. 
+Formula~\ref{eq:fool-tuple-let} can be written in TFX as follows. 
+Notice that the type declaration contains the elements of both tuples in 
+the simultaneous definition.
 \begin{verbatim}
 tff(plus,type,plus: ([$real,$real] * [$real,$real]) > [$real,$real]).
 tff(plus_def,axiom,
@@ -1094,6 +1079,45 @@ tff(plus_def,axiom,
              [[a,b]:= X, [c,d]:= Y],
              [$sum(a,c),$sum(b,d)]) ).
 \end{verbatim}
+
+Formula~\ref{eq:parallel-let-tuple-example} can be written in TFX syntax as:
+\begin{verbatim}
+tff(a,type,a: $i).
+tff(b,type,b: $i).
+tff(p,type,p: ($i * $i) > $o).
+tff(pba,axiom,
+    $let([a: $i,b: $i],
+         [a,b]:= [b,a],
+         p(a,b))).
+\end{verbatim}
+
+The defined symbols have scope over the formula/term in which the definitions 
+are applied, shadowing any definition outside the let expression. 
+The righhand side of a definition can have symbols with the same name as 
+the defined symbol, but refer to symbols defined outside the let expression. 
+In the following example the local definition of the {\tt array} function 
+symbols shadow the global declaration.
+\begin{verbatim}
+tff(array_type,type,array: $int > $real).
+tff(p_type,type,p: $real > $o).
+tff(let_3,axiom,
+    $let(array: $int > $real,
+         array(I):= $ite(I = 3,5.2,array(I)),
+         p($sum(array(2),array(3))) ) ).
+\end{verbatim}
+% \ldots~is equivalent to~\ldots
+% \begin{verbatim}
+% tff(array_type,type,array: $int > $real).
+% tff(p_type,type,p: $real > $o).
+% tff(let_3,axiom,p($sum(array(2),5.2)) ).
+% \end{verbatim}
+
+The occurrence of array in the lefthand side of the definition 
+{\tt array(I):=}, and the occurrences in the formula in which the let 
+expression is applied {\tt p(\$sum(array(2),array(3)))}, are the defined 
+symbol. 
+The occurrence in the righthand side of the definition 
+{\tt \$ite(I = 3,5,array(I))} is the globally defined symbol.
 
 %------------------------------------------------------------------------------
 \section{Software Support and Examples}
@@ -1114,7 +1138,7 @@ its usual resolution calculi for first-order logic.
 At the time of writing this paper the latest released version of Vampire,
 4.2.2, uses a syntax for FOOL that slightly differs from TFX. 
 Full support for the TFX syntax has been implemented in a recent revision of 
-the Vampire source code~\footnote{%
+the Vampire source code\footnote{%
 \url{https://github.com/vprover/vampire}}, and will be available
 in the next release of Vampire.
 
@@ -1238,12 +1262,14 @@ tff(c_says,hypothesis, says(c,says(b,$false)) ).
 \label{Truthteller}
 \end{figure}
 
+More TFX examples from are available from the TPTP
+web site \url{http://www.tptp.org/TPTP/Proposals/TFXExamples.tgz}.
 %------------------------------------------------------------------------------
 \section{Conclusion}
 \label{Conclusion}
 
-This paper has introduced the Typed First-order eXtended form (TFX) of the
-TPTP's TFF syntax.
+This paper has introduced the eXtended Typed First-order form (TFX) of the
+TPTP's TFF language.
 TFX includes formulae as terms, use of variables of the boolean type as
 formulae, tuple terms and tuple types, conditional expressions,
 and let expressions.
@@ -1253,8 +1279,8 @@ program analysis, and translated from more expressive logics.
 Now that the syntax is settled, ATP system developers will be able to
 implement the new language features.
 It is already apparent from the SMT community that these are useful features,
-and systems that can already parse the SMT syntax need only new parsers (for
-TFX syntax) to implement the features.
+and systems that can already parse and reason using the SMT version 2 syntax 
+need only new parsers (for TFX syntax) to implement the features.
 In parallel, version v8.0.0 of the TPTP will include problems that use TFX,
 and the automated reasoning community is invited to submit problems for
 inclusion in the TPTP.
