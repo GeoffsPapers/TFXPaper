@@ -357,14 +357,14 @@ $\mathit{imply}$ of the type $\bool \times \bool \to \bool$ using this axiom:
 \begin{equation}\label{eq:fool-imply}
 (\forall x:\bool)(\forall y:\bool)(\mathit{imply}(x,y) \liff \neg x \lor y).
 \end{equation}
-Formula \ref{eq:fool-imply} can be equivalently expressed with $=$ instead of
-$\liff$.
 Then it is possible to express that $P$ is a graph of a (partial) function of 
 the type $\sigma \to \tau$ as:
 \begin{equation}\label{eq:bool-arg-example}
 (\forall x:\sigma)(\forall y:\tau)(\forall z:\tau)
 \mathit{imply}(P(x,y) \land P(x,z), y = z)
 \end{equation}
+Formula \ref{eq:fool-imply} can be equivalently expressed with $=$ instead of
+$\liff$.
 
 \subsubsection{Tuples}
 FOOL extended with the theory of tuples contains a type
@@ -455,6 +455,23 @@ two simultaneous local definition of tuples:
   \end{aligned}
 \end{equation}
 
+The semantics of let expressions in FOOL mirrors the semantics of
+simultaneous non-recursive local definitions in programming languages. 
+That is, none of the definitions $D_1,\ldots,\allowbreak D_n$ uses function or
+predicate symbols created by any other definition. 
+In the following example, constants $a$ and $b$ are swapped by a let 
+expression. 
+The resulting formula is equivalent to $P(b, a)$.
+\begin{equation}\label{eq:parallel-let-example}
+\mathtt{let}\;\binding{a}{b}\,;\,\binding{b}{a}\;\mathtt{in}\;P(a, b)
+\end{equation}
+
+Formula~\ref{eq:parallel-let-example} can be equivalently expressed using 
+a let expression with a definition of a tuple:
+\begin{equation}\label{eq:parallel-let-tuple-example}
+\mathtt{let}\;\binding{(a,b)}{(b,a)}\;\mathtt{in}\;P(a, b)
+\end{equation}
+
 The main application of let expressions with tuple definitions is in 
 problems coming from program analysis, namely modelling of assignments
 \cite{KKV18}.
@@ -495,23 +512,6 @@ assert x <= y;
 \caption{FOOL encoding of an {\tt if} statement}
 \label{fig:simple-if}
 \end{figure}
-
-The semantics of let expressions in FOOL mirrors the semantics of
-simultaneous non-recursive local definitions in programming languages. 
-That is, none of the definitions $D_1,\ldots,\allowbreak D_n$ uses function or
-predicate symbols created by any other definition. 
-In the following example, constants $a$ and $b$ are swapped by a let 
-expression. 
-The resulting formula is equivalent to $P(b, a)$.
-\begin{equation}\label{eq:parallel-let-example}
-\mathtt{let}\;\binding{a}{b}\,;\,\binding{b}{a}\;\mathtt{in}\;P(a, b)
-\end{equation}
-
-Formula~\ref{eq:parallel-let-example} can be equivalently expressed using 
-a let expression with a definition of a tuple:
-\begin{equation}\label{eq:parallel-let-tuple-example}
-\mathtt{let}\;\binding{(a,b)}{(b,a)}\;\mathtt{in}\;P(a, b)
-\end{equation}
 
 %------------------------------------------------------------------------------
 \section{The TFX Syntax}
@@ -778,9 +778,10 @@ This is equivalent to:
 tff(let_tuple_2,axiom,p(f(i,i,f(i,i,i,i),f(i,i,i,i))) ).
 \end{verbatim}
 
-The defined symbols have scope over the formula/term in which the definitions 
-are applied, shadowing any definition outside the let expression. 
-The righhand side of a definition can have symbols with the same name as 
+The defined symbols of a let expression have scope over the formula/term in 
+which the definitions are applied, shadowing any definition outside the let 
+expression. 
+The righthand side of a definition can have symbols with the same name as 
 the defined symbol, but refer to symbols defined outside the let expression. 
 In the following example the local definition of the {\tt array} function 
 symbols shadow the global declaration.
@@ -842,12 +843,14 @@ order.
 \begin{figure}[htbp]
 \begin{small}
 \begin{verbatim}
+%------------------------------------------------------------------------------
 tff(p_type,type,p: [$int,$int] > $o).
 tff(d_type,type,d: [$int,$int]).
 tff(ite_3,axiom,
     ! [X:$int,Y:$int] : p($ite($greater(X,Y),[X,Y],[Y,X])) ).
 tff(ite_4,axiom,
     ! [X:$int,Y:$int] : d = $ite($greater(X,Y),[X,Y],[Y,X]) ).
+%------------------------------------------------------------------------------
 \end{verbatim}
 \end{small}
 \caption{Tuples in conditional expressions}
